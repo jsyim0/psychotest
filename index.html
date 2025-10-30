@@ -1,12 +1,205 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>심리테스트 (E/S/O/C)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>심리테스트 (E/S/O/C)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: linear-gradient(120deg, #eef2ff, #e0e7ff);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; margin: 0; transition: background 0.5s ease;
+  }
+  .container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    width: 95%; max-width: 500px;
+    padding: 24px; text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+  h1 { font-size: 1.6em; margin-bottom: 10px; color: #1e3a8a; }
+  .btn {
+    background: #4f46e5; color: white;
+    border: none; border-radius: 10px;
+    padding: 10px 22px; font-size: 1em;
+    cursor: pointer; transition: 0.2s;
+  }
+  .btn:hover { background: #4338ca; transform: scale(1.03); }
+  .choice {
+    background: #f8fafc; color: #111827;
+    border-radius: 14px; margin: 10px 0; padding: 14px 16px;
+    cursor: pointer; border: 2px solid transparent;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    transition: all 0.25s ease; font-weight: 500;
+  }
+  .choice:hover {
+    transform: scale(1.03);
+    border-color: #6366f1;
+    background: #eef2ff;
+    color: #1e3a8a;
+  }
+  .choice.selected {
+    background: linear-gradient(90deg, #6366f1, #a78bfa);
+    color: white; transform: scale(1.05);
+  }
+  .progress { height: 10px; background: #e5e7eb; border-radius: 5px; margin: 15px 0; }
+  .progress-fill { height: 100%; background: #6366f1; width: 0%; border-radius: 5px; transition: width 0.3s ease; }
+  canvas { margin-top: 10px; }
+  @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+  body.dark { background: linear-gradient(120deg, #1e293b, #334155); color: #f8fafc; }
+  body.dark .container { background: #334155; color: #f8fafc; }
+  body.dark .choice { background: #475569; color: #f8fafc; }
+  body.dark .choice:hover { background: #6366f1; color: white; }
+</style>
 </head>
 <body>
-  <h1>심리테스트 웹앱</h1>
-  <p>여기에 전체 기능 포함된 index.html 코드가 들어갑니다.</p>
+<div class="container">
+  <h1 id="title">심리테스트 (E/S/O/C)</h1>
+  <div id="lang-select">
+    <select id="lang" onchange="setLang(this.value)">
+      <option value="ko">한국어</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+
+  <div id="start-screen">
+    <p id="intro">당신의 성향을 간단히 알아보세요.<br>5개의 질문에 답하면 결과를 알려드릴게요.</p>
+    <button class="btn" onclick="startQuiz()">시작하기</button>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div class="progress"><div class="progress-fill" id="progress"></div></div>
+    <h3 id="question"></h3>
+    <div id="choices"></div>
+  </div>
+
+  <div id="result-screen" class="hidden fade">
+    <h2 id="result-title">결과</h2>
+    <canvas id="chart" width="400" height="300"></canvas>
+    <h3 id="type"></h3>
+    <p id="desc"></p>
+    <button class="btn" onclick="restart()">다시하기</button>
+    <button class="btn" onclick="shareResult()">공유하기</button>
+  </div>
+</div>
+
+<script>
+const data = {
+  ko: { start:"시작하기", intro:"당신의 성향을 간단히 알아보세요.<br>5개의 질문에 답하면 결과를 알려드릴게요.", result:"결과" },
+  en: { start:"Start", intro:"Find out your personality type!<br>Answer 5 short questions.", result:"Result" },
+  ja: { start:"開始", intro:"5つの質問に答えて性格タイプを診断します。", result:"結果" },
+  fr: { start:"Commencer", intro:"Répondez à 5 questions pour découvrir votre personnalité.", result:"Résultat" },
+  es: { start:"Comenzar", intro:"Responde 5 preguntas para conocer tu tipo de personalidad.", result:"Resultado" }
+};
+
+let lang = "ko";
+function setLang(l){ lang = l; document.getElementById("intro").innerHTML = data[l].intro; document.querySelector("button.btn").innerText = data[l].start; document.getElementById("result-title").innerText = data[l].result; }
+
+const questions = [
+  {q:"주말에 친구들이 약속을 잡으면 나는…", c:[["적극적으로 나선다","E"],["조용히 쉰다","S"],["새로운 활동을 제안한다","O"],["일정을 꼼꼼히 확인한다","C"]]},
+  {q:"낯선 상황에서 나는…", c:[["먼저 말 건다","E"],["조용히 살핀다","S"],["새로운 접근을 시도한다","O"],["계획을 세운다","C"]]},
+  {q:"일을 처리할 때 나는…", c:[["함께 해결","E"],["침착하게","S"],["창의적으로","O"],["체계적으로","C"]]},
+  {q:"새로운 취미를 고를 때 나는…", c:[["친구들과","E"],["꾸준히 할 수 있는","S"],["색다른","O"],["배울 수 있는","C"]]},
+  {q:"회의에서 의견을 말할 때 나는…", c:[["먼저 말한다","E"],["조용히","S"],["아이디어를 낸다","O"],["근거를 제시한다","C"]]},
+  {q:"여행을 계획할 때 나는…", c:[["함께 즐길 일정","E"],["편안한 장소","S"],["모험","O"],["세부 일정","C"]]}
+];
+
+let selected=[], index=0, score={E:0,S:0,O:0,C:0}, chart;
+
+function startQuiz(){
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("quiz-screen").classList.remove("hidden");
+  selected = [...questions].sort(()=>Math.random()-0.5).slice(0,5);
+  index=0; score={E:0,S:0,O:0,C:0};
+  speak("테스트를 시작합니다.");
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = selected[index];
+  document.getElementById("question").innerText = `(${index+1}/5) ${q.q}`;
+  const cDiv=document.getElementById("choices"); cDiv.innerHTML="";
+  q.c.sort(()=>Math.random()-0.5).forEach(([txt,t])=>{
+    const d=document.createElement("div");
+    d.className="choice"; d.innerText=txt;
+    d.onclick=e=>{d.classList.add("selected"); setTimeout(()=>select(t),200);};
+    cDiv.appendChild(d);
+  });
+  document.getElementById("progress").style.width=((index)/5)*100+"%";
+  speak(q.q);
+}
+
+function select(t){ score[t]++; index++; index<selected.length?showQuestion():showResult(); }
+
+function showResult(){
+  document.getElementById("quiz-screen").classList.add("hidden");
+  document.getElementById("result-screen").classList.remove("hidden");
+  document.getElementById("progress").style.width="100%";
+  const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
+  const top=sorted.slice(0,3).map(e=>e[0]).join("");
+  document.getElementById("type").innerText=`당신의 유형: ${top}`;
+  document.getElementById("desc").innerText=getDesc(top);
+  speak(`당신의 결과는 ${top} 유형입니다. ${getDesc(top)}`);
+  const ctx=document.getElementById("chart");
+  chart=new Chart(ctx,{type:"bar",data:{labels:["E","S","O","C"],datasets:[{data:["E","S","O","C"].map(t=>score[t]),backgroundColor:["#6366f1","#a78bfa","#60a5fa","#34d399"]}]},options:{scales:{y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+}
+
+function getDesc(type){
+  const s=new Set(type);
+  if(["E","O","C"].every(x=>s.has(x)))return"사교적이며 창의적이고 체계적인 리더형입니다.";
+  if(["E","S","C"].every(x=>s.has(x)))return"현실적이며 신뢰받는 협력가형입니다.";
+  if(["E","O"].every(x=>s.has(x)))return"활발하고 아이디어가 풍부한 탐험가형입니다.";
+  if(["S","C"].every(x=>s.has(x)))return"차분하고 책임감 있는 분석가형입니다.";
+  if(["O","C"].every(x=>s.has(x)))return"창의적이고 계획적인 혁신가형입니다.";
+  return"균형 잡힌 복합형입니다.";
+}
+
+function restart(){
+  document.getElementById("result-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
+  if(chart) chart.destroy();
+  speak("테스트를 다시 시작합니다.");
+}
+
+// 🗣️ 음성 안내 기능 + 미지원 시 텍스트 대체
+const isSpeechSupported = "speechSynthesis" in window;
+function speak(text){
+  if(!isSpeechSupported){showVoiceFallback(text);return;}
+  window.speechSynthesis.cancel();
+  const msg=new SpeechSynthesisUtterance(text);
+  msg.lang={ko:"ko-KR",en:"en-US",ja:"ja-JP",fr:"fr-FR",es:"es-ES"}[lang]||"ko-KR";
+  msg.rate=1; msg.pitch=1; msg.volume=1;
+  window.speechSynthesis.speak(msg);
+}
+function showVoiceFallback(text){
+  const old=document.getElementById("voice-fallback"); if(old) old.remove();
+  const box=document.createElement("div");
+  box.id="voice-fallback";
+  Object.assign(box.style,{position:"fixed",bottom:"20px",left:"50%",transform:"translateX(-50%)",
+  background:"rgba(15,23,42,0.9)",color:"white",padding:"12px 18px",borderRadius:"12px",
+  fontSize:"0.95em",zIndex:"9999",boxShadow:"0 4px 10px rgba(0,0,0,0.3)",transition:"opacity 0.5s ease"});
+  box.innerText=`🔈 음성 안내 미지원: "${text}"`;
+  document.body.appendChild(box);
+  setTimeout(()=>{box.style.opacity="0";setTimeout(()=>box.remove(),500);},4000);
+}
+
+// 결과 공유
+function shareResult(){
+  const url=window.location.href;
+  const text=document.getElementById("type").innerText;
+  if(navigator.share){
+    navigator.share({title:"심리테스트 결과",text,text:url});
+  }else{
+    navigator.clipboard.writeText(`${text} - ${url}`);
+    alert("링크가 복사되었습니다!");
+  }
+}
+</script>
 </body>
 </html>
