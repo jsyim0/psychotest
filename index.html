@@ -1,47 +1,75 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>심리테스트 (E/S/O/C)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>심리테스트 — E/S/O/C (완성형)</title>
+
+  <!-- 스타일 -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 스크립트: defer로 안전하게 로드 -->
   <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>심리테스트 (E/S/O/C)</h1>
-    <div id="headerControls">
-      <select id="lang">
-        <option value="ko">한국어 🇰🇷</option>
-        <option value="en">English 🇺🇸</option>
-        <option value="ja">日本語 🇯🇵</option>
-        <option value="fr">Français 🇫🇷</option>
-        <option value="es">Español 🇪🇸</option>
-        <option value="zh">中文 🇨🇳</option>
-      </select>
-      <button id="startBtn" class="btn">시작</button>
-    </div>
-  </header>
-
-  <main>
-    <section id="startBox">
-      <p>버튼을 눌러 테스트를 시작하세요.</p>
-    </section>
-
-    <section id="questionBox" style="display:none;">
-      <div id="questionText"></div>
-      <div id="choices"></div>
-      <button id="nextBtn" class="btn">다음</button>
-    </section>
-
-    <section id="resultBox" style="display:none;">
-      <h2 id="resultType"></h2>
-      <p id="resultDesc"></p>
-      <div id="chartWrap" class="hidden">
-        <canvas id="resultChart"></canvas>
+  <div class="card" role="application" aria-label="심리테스트">
+    <header>
+      <h1 id="appTitle">심리테스트 — E/S/O/C</h1>
+      <div id="headerControls" class="controls">
+        <select id="langSelect" aria-label="언어 선택"></select>
+        <button id="startBtn" class="btn">시작</button>
       </div>
-    </section>
-  </main>
+    </header>
+
+    <main>
+      <!-- 왼쪽: 퀴즈 -->
+      <section class="quiz">
+        <div id="startBox" class="panel start-panel">
+          <p id="introText" class="intro">언어를 선택한 뒤 시작을 눌러주세요. 시작하면 언어 선택과 시작 버튼은 숨겨집니다.</p>
+          <div class="trait-cards" aria-hidden="false">
+            <div class="trait E">💬 <strong>E — 외향성</strong><div class="small">사람들과 어울리며 에너지를 얻는 유형</div></div>
+            <div class="trait S">⚖️ <strong>S — 안정성</strong><div class="small">차분하고 균형을 중시하는 유형</div></div>
+            <div class="trait O">💡 <strong>O — 개방성</strong><div class="small">새로운 것에 호기심 많은 유형</div></div>
+            <div class="trait C">📘 <strong>C — 성실성</strong><div class="small">계획적이고 책임감 있는 유형</div></div>
+          </div>
+        </div>
+
+        <div id="questionCard" class="panel" style="display:none;">
+          <div class="progress"><div class="fill" id="progressFill"></div></div>
+          <div id="questionTitle" class="question-title"></div>
+          <div id="choices" class="choices" role="list"></div>
+        </div>
+
+        <div id="resultCard" class="panel" style="display:none;">
+          <h3 id="resultTitle">결과</h3>
+          <p id="resultSummary" class="small"></p>
+          <div id="traitDetails" style="margin-top:8px"></div>
+
+          <div class="result-actions" style="margin-top:10px;">
+            <button class="btn" id="downloadBtn">차트 이미지 저장</button>
+            <button class="btn" id="shareBtn">공유</button>
+            <button class="btn" id="restartBtn">다시하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 오른쪽: 시각화 -->
+      <aside class="visual">
+        <div id="chartWrap" class="chart-wrap">
+          <div class="chart-header">
+            <div class="small" id="chartLabel">차트 (레이더)</div>
+            <div class="small" id="chartHint">결과 완료 시 표시됩니다</div>
+          </div>
+          <div class="chart-area">
+            <canvas id="resultChart" aria-label="결과 차트"></canvas>
+          </div>
+        </div>
+        <div class="small" style="text-align:center; margin-top:8px;">아이콘: 💬 E · ⚖️ S · 💡 O · 📘 C</div>
+      </aside>
+    </main>
+  </div>
 </body>
 </html>
