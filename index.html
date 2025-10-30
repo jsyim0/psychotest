@@ -81,24 +81,11 @@
     font-size: 1.3rem;
     margin-bottom: 4px;
   }
-  .E {
-    background: #eff6ff;
-    color: #1d4ed8;
-  }
-  .S {
-    background: #f0fdf4;
-    color: #15803d;
-  }
-  .O {
-    background: #fff7ed;
-    color: #c2410c;
-  }
-  .C {
-    background: #f5f3ff;
-    color: #6d28d9;
-  }
-  .question-card,
-  .result-card {
+  .E { background: #eff6ff; color: #1d4ed8; }
+  .S { background: #f0fdf4; color: #15803d; }
+  .O { background: #fff7ed; color: #c2410c; }
+  .C { background: #f5f3ff; color: #6d28d9; }
+  .question-card, .result-card {
     display: none;
     background: white;
     border-radius: 12px;
@@ -116,9 +103,7 @@
     background: #f8fafc;
     cursor: pointer;
   }
-  .choice:hover {
-    background: #eef2ff;
-  }
+  .choice:hover { background: #eef2ff; }
   .result-detail {
     margin-top: 10px;
     font-size: 0.9rem;
@@ -154,8 +139,12 @@
   <div class="card">
     <header>
       <h1>심리테스트 — E/S/O/C 분석</h1>
-      <div><select id="langSelect"></select> <button class="btn" id="startBtn">시작</button></div>
+      <div id="headerControls">
+        <select id="langSelect"></select>
+        <button class="btn" id="startBtn">시작</button>
+      </div>
     </header>
+
     <main>
       <section class="quiz">
         <!-- ✅ 시작 페이지 -->
@@ -224,6 +213,7 @@ const QUESTIONS_BY_LANG = {
 let lang = "ko", qIndex = 0, scores = { E: 0, S: 0, O: 0, C: 0 }, questions = [];
 const langSelect = document.getElementById("langSelect"),
   startBtn = document.getElementById("startBtn"),
+  headerControls = document.getElementById("headerControls"),
   startBox = document.getElementById("startBox"),
   questionCard = document.getElementById("questionCard"),
   choicesDiv = document.getElementById("choices"),
@@ -240,9 +230,13 @@ startBtn.onclick = startQuiz;
 restartBtn.onclick = () => location.reload();
 
 function startQuiz() {
+  // 시작 시 버튼과 언어 선택 숨기기
+  headerControls.style.display = "none";
+  
   questions = QUESTIONS_BY_LANG[lang];
   qIndex = 0; scores = { E: 0, S: 0, O: 0, C: 0 };
-  startBox.style.display = "none"; questionCard.style.display = "block";
+  startBox.style.display = "none";
+  questionCard.style.display = "block";
   showQuestion();
 }
 
@@ -252,7 +246,8 @@ function showQuestion() {
   choicesDiv.innerHTML = "";
   q.c.forEach(([text, trait]) => {
     const div = document.createElement("div");
-    div.className = "choice"; div.textContent = text;
+    div.className = "choice";
+    div.textContent = text;
     div.onclick = () => { scores[trait]++; nextQ(); };
     choicesDiv.appendChild(div);
   });
@@ -266,7 +261,8 @@ function nextQ() {
 }
 
 function finishQuiz() {
-  questionCard.style.display = "none"; resultCard.style.display = "block";
+  questionCard.style.display = "none";
+  resultCard.style.display = "block";
   progressFill.style.width = "100%";
   const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
   const top = sorted[0][0];
