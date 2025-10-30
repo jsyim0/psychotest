@@ -3,75 +3,193 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>심리테스트 — 다중 시각화 (E/S/O/C)</title>
+<title>심리테스트 — E/S/O/C 성향 분석</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  :root{
-    --accent:#6366f1;
-    --bg-light:linear-gradient(120deg,#eef2ff,#e0e7ff);
-    --card-light:#ffffff;
-    --text-dark:#0f172a;
+  :root {
+    --accent: #6366f1;
+    --bg-light: linear-gradient(120deg, #eef2ff, #e0e7ff);
+    --card-light: #ffffff;
   }
-  body{font-family:Inter,"Pretendard","Noto Sans KR",system-ui; background:var(--bg-light); margin:0; padding:20px; display:flex; justify-content:center;}
-  .card{max-width:900px;width:100%;background:var(--card-light);border-radius:16px;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-  header h1{margin:0;font-size:1.3rem;background:linear-gradient(45deg,#4f46e5,#8b5cf6);-webkit-background-clip:text;color:transparent;}
-  .btn{background:var(--accent);color:white;border:none;border-radius:10px;padding:8px 12px;cursor:pointer;}
-  main{display:flex;gap:18px;flex-wrap:wrap;}
-  .quiz{flex:1 1 360px;min-width:280px;}
-  .start-box{border-radius:12px;padding:16px;background:white;box-shadow:0 6px 18px rgba(2,6,23,0.06);}
-  .trait-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
-  .trait{border-radius:12px;padding:10px;text-align:center;font-size:0.9rem;box-shadow:0 3px 8px rgba(0,0,0,0.05);}
-  .E{background:#eff6ff;color:#1d4ed8;}
-  .S{background:#f0fdf4;color:#15803d;}
-  .O{background:#fff7ed;color:#c2410c;}
-  .C{background:#f5f3ff;color:#6d28d9;}
-  .question-card,.result-card{display:none;background:white;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(2,6,23,0.06);}
-  .choices{display:flex;flex-direction:column;gap:10px;}
-  .choice{padding:10px;border-radius:8px;background:#f8fafc;cursor:pointer;}
-  .choice:hover{background:#eef2ff;}
-  .result-detail{margin-top:10px;font-size:0.9rem;line-height:1.4;color:#475569;}
-  .trait-summary{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.9rem;}
-  .trait-summary div{padding:6px 8px;border-radius:8px;background:#f8fafc;}
-  .visual{width:340px;flex:0 0 340px;min-width:260px;}
+  body {
+    font-family: Inter, "Pretendard", "Noto Sans KR", system-ui;
+    background: var(--bg-light);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    max-width: 900px;
+    width: 100%;
+    background: var(--card-light);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    background: linear-gradient(45deg, #4f46e5, #8b5cf6);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  main {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .quiz {
+    flex: 1 1 360px;
+    min-width: 280px;
+  }
+  .start-box {
+    border-radius: 12px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  }
+  .trait-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .trait {
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  }
+  .trait strong {
+    display: block;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  .E {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+  .S {
+    background: #f0fdf4;
+    color: #15803d;
+  }
+  .O {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+  .C {
+    background: #f5f3ff;
+    color: #6d28d9;
+  }
+  .question-card,
+  .result-card {
+    display: none;
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice {
+    padding: 10px;
+    border-radius: 8px;
+    background: #f8fafc;
+    cursor: pointer;
+  }
+  .choice:hover {
+    background: #eef2ff;
+  }
+  .result-detail {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #475569;
+  }
+  .trait-summary {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+  .trait-summary div {
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+  .visual {
+    width: 340px;
+    flex: 0 0 340px;
+    min-width: 260px;
+  }
+  @media (max-width: 700px) {
+    .visual {
+      width: 100%;
+      order: -1;
+    }
+  }
 </style>
 </head>
 <body>
   <div class="card">
     <header>
-      <h1>심리테스트 — 다양한 시각화</h1>
+      <h1>심리테스트 — E/S/O/C 분석</h1>
       <div><select id="langSelect"></select> <button class="btn" id="startBtn">시작</button></div>
     </header>
     <main>
       <section class="quiz">
-        <!-- ✅ 시작 페이지 개선 -->
+        <!-- ✅ 시작 페이지 -->
         <div id="startBox" class="start-box">
-          <p id="introText">질문에 답하면 E/S/O/C 성향을 분석해 드립니다.<br>언어를 선택한 뒤 시작하세요.</p>
+          <p id="introText">
+            질문에 답하면 E/S/O/C 성향을 분석해 드립니다.<br>언어를 선택한 뒤 시작하세요.
+          </p>
           <div class="trait-cards">
-            <div class="trait E"><strong>E</strong> — 외향성<br><small>사람들과의 교류를 즐기며 활발한 성향</small></div>
-            <div class="trait S"><strong>S</strong> — 안정성<br><small>조용하고 안정된 환경을 선호하는 성향</small></div>
-            <div class="trait O"><strong>O</strong> — 개방성<br><small>새로움을 추구하고 창의적인 사고를 하는 성향</small></div>
-            <div class="trait C"><strong>C</strong> — 성실성<br><small>체계적이고 계획적으로 행동하는 성향</small></div>
+            <div class="trait E">💬 <strong>E — 외향성</strong><small>사람들과 어울리며 에너지를 얻는 타입</small></div>
+            <div class="trait S">⚖️ <strong>S — 안정성</strong><small>차분하고 균형 잡힌 판단을 중시하는 타입</small></div>
+            <div class="trait O">💡 <strong>O — 개방성</strong><small>새로운 아이디어와 변화를 즐기는 타입</small></div>
+            <div class="trait C">📘 <strong>C — 성실성</strong><small>책임감 있고 계획적인 완벽주의자</small></div>
           </div>
         </div>
 
         <!-- 질문 카드 -->
         <div id="questionCard" class="question-card">
-          <div class="progress"><div id="progressFill" style="height:10px;background:#6366f1;width:0%;border-radius:10px;"></div></div>
+          <div class="progress">
+            <div id="progressFill" style="height:10px;background:#6366f1;width:0%;border-radius:10px;"></div>
+          </div>
           <div id="questionTitle" style="font-weight:bold;"></div>
           <div class="choices" id="choices"></div>
         </div>
 
-        <!-- ✅ 결과 카드 개선 -->
+        <!-- ✅ 결과 카드 -->
         <div id="resultCard" class="result-card">
           <h3 id="resultTitle">결과</h3>
           <p id="resultSummary"></p>
           <div class="result-detail" id="traitDesc"></div>
           <div class="trait-summary">
-            <div class="E">E — 외향성: 활발하고 리더십이 강함</div>
-            <div class="S">S — 안정성: 차분하고 신중한 성향</div>
-            <div class="O">O — 개방성: 호기심 많고 창의적</div>
-            <div class="C">C — 성실성: 꼼꼼하고 책임감이 강함</div>
+            <div class="E">💬 E — 외향성: 활발하고 리더십이 강함</div>
+            <div class="S">⚖️ S — 안정성: 차분하고 신중한 성향</div>
+            <div class="O">💡 O — 개방성: 호기심 많고 창의적</div>
+            <div class="C">📘 C — 성실성: 꼼꼼하고 책임감이 강함</div>
           </div>
           <div style="margin-top:10px;">
             <button class="btn" id="restartBtn">다시하기</button>
@@ -90,86 +208,95 @@
 /* ===== 질문 데이터 ===== */
 const QUESTIONS_BY_LANG = {
   ko: [
-    { q:"주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?",
-      c:[["먼저 참여 의사를 밝힌다","E"],["조용히 상황을 지켜본다","S"],["새로운 활동을 제안한다","O"],["일정을 꼼꼼히 확인한다","C"]] },
-    { q:"낯선 사람들과 있을 때 당신의 행동은?",
-      c:[["먼저 말을 건다","E"],["필요할 때만 말한다","S"],["새로운 주제를 제시한다","O"],["상대 반응을 살핀다","C"]] },
-    { q:"새로운 일을 맡게 되었을 때 어떻게 시작하나요?",
-      c:[["협력하며 진행한다","E"],["계획을 세운다","C"],["즉흥적으로 시도한다","O"],["지침을 숙지한 후 진행한다","S"]] },
-    { q:"여행을 준비할 때 가장 중요하게 생각하는 것은?",
-      c:[["모두가 즐길 일정","E"],["편안한 숙소","S"],["새로운 경험","O"],["세부 계획","C"]] },
-    { q:"모임에서 의견이 나뉠 때 당신은?",
-      c:[["분위기를 이끌며 조율한다","E"],["조용히 판단한다","S"],["창의적 해결책을 제시한다","O"],["논리적으로 근거를 제시한다","C"]] }
+    { q: "주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?",
+      c: [["먼저 참여 의사를 밝힌다", "E"], ["조용히 상황을 지켜본다", "S"], ["새로운 활동을 제안한다", "O"], ["일정을 꼼꼼히 확인한다", "C"]] },
+    { q: "낯선 사람들과 있을 때 당신의 행동은?",
+      c: [["먼저 말을 건다", "E"], ["필요할 때만 말한다", "S"], ["새로운 주제를 제시한다", "O"], ["상대 반응을 살핀다", "C"]] },
+    { q: "새로운 일을 맡게 되었을 때 어떻게 시작하나요?",
+      c: [["협력하며 진행한다", "E"], ["계획을 세운다", "C"], ["즉흥적으로 시도한다", "O"], ["지침을 숙지한 후 진행한다", "S"]] },
+    { q: "여행을 준비할 때 가장 중요하게 생각하는 것은?",
+      c: [["모두가 즐길 일정", "E"], ["편안한 숙소", "S"], ["새로운 경험", "O"], ["세부 계획", "C"]] },
+    { q: "모임에서 의견이 나뉠 때 당신은?",
+      c: [["분위기를 이끌며 조율한다", "E"], ["조용히 판단한다", "S"], ["창의적 해결책을 제시한다", "O"], ["논리적으로 근거를 제시한다", "C"]] }
   ]
 };
 
-let lang='ko',qIndex=0,scores={E:0,S:0,O:0,C:0},questions=[];
-const langSelect=document.getElementById('langSelect'),
-startBtn=document.getElementById('startBtn'),
-startBox=document.getElementById('startBox'),
-questionCard=document.getElementById('questionCard'),
-choicesDiv=document.getElementById('choices'),
-questionTitle=document.getElementById('questionTitle'),
-progressFill=document.getElementById('progressFill'),
-resultCard=document.getElementById('resultCard'),
-resultSummary=document.getElementById('resultSummary'),
-traitDesc=document.getElementById('traitDesc'),
-resultChart=document.getElementById('resultChart'),
-restartBtn=document.getElementById('restartBtn');
+let lang = "ko", qIndex = 0, scores = { E: 0, S: 0, O: 0, C: 0 }, questions = [];
+const langSelect = document.getElementById("langSelect"),
+  startBtn = document.getElementById("startBtn"),
+  startBox = document.getElementById("startBox"),
+  questionCard = document.getElementById("questionCard"),
+  choicesDiv = document.getElementById("choices"),
+  questionTitle = document.getElementById("questionTitle"),
+  progressFill = document.getElementById("progressFill"),
+  resultCard = document.getElementById("resultCard"),
+  resultSummary = document.getElementById("resultSummary"),
+  traitDesc = document.getElementById("traitDesc"),
+  resultChart = document.getElementById("resultChart"),
+  restartBtn = document.getElementById("restartBtn");
 
-langSelect.innerHTML='<option value="ko">한국어</option>';
-startBtn.onclick=startQuiz;
-restartBtn.onclick=()=>location.reload();
+langSelect.innerHTML = '<option value="ko">한국어</option>';
+startBtn.onclick = startQuiz;
+restartBtn.onclick = () => location.reload();
 
-function startQuiz(){
-  questions=QUESTIONS_BY_LANG[lang];
-  qIndex=0;scores={E:0,S:0,O:0,C:0};
-  startBox.style.display='none';questionCard.style.display='block';
+function startQuiz() {
+  questions = QUESTIONS_BY_LANG[lang];
+  qIndex = 0; scores = { E: 0, S: 0, O: 0, C: 0 };
+  startBox.style.display = "none"; questionCard.style.display = "block";
   showQuestion();
 }
 
-function showQuestion(){
-  const q=questions[qIndex];
-  questionTitle.textContent=`(${qIndex+1}/${questions.length}) ${q.q}`;
-  choicesDiv.innerHTML='';
-  q.c.forEach(([text,trait])=>{
-    const div=document.createElement('div');
-    div.className='choice';div.textContent=text;
-    div.onclick=()=>{scores[trait]++;nextQ();};
+function showQuestion() {
+  const q = questions[qIndex];
+  questionTitle.textContent = `(${qIndex + 1}/${questions.length}) ${q.q}`;
+  choicesDiv.innerHTML = "";
+  q.c.forEach(([text, trait]) => {
+    const div = document.createElement("div");
+    div.className = "choice"; div.textContent = text;
+    div.onclick = () => { scores[trait]++; nextQ(); };
     choicesDiv.appendChild(div);
   });
-  progressFill.style.width=`${(qIndex/questions.length)*100}%`;
+  progressFill.style.width = `${(qIndex / questions.length) * 100}%`;
 }
 
-function nextQ(){
+function nextQ() {
   qIndex++;
-  if(qIndex<questions.length) showQuestion();
+  if (qIndex < questions.length) showQuestion();
   else finishQuiz();
 }
 
-function finishQuiz(){
-  questionCard.style.display='none';resultCard.style.display='block';
-  progressFill.style.width='100%';
-  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  const top=sorted[0][0];
-  const typeMap={E:"외향형",S:"안정형",O:"개방형",C:"성실형"};
-  resultSummary.textContent=`당신은 ${typeMap[top]} 성향이 강합니다.`;
-  traitDesc.textContent={
-    E:"사람들과의 교류를 통해 에너지를 얻고 활발히 활동합니다.",
-    S:"안정과 신중함을 중시하며 차분하게 행동합니다.",
-    O:"새로운 아이디어와 경험을 추구하는 창의적 사고를 가집니다.",
-    C:"책임감 있고 계획적으로 목표를 달성합니다."
+function finishQuiz() {
+  questionCard.style.display = "none"; resultCard.style.display = "block";
+  progressFill.style.width = "100%";
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = sorted[0][0];
+  const typeMap = { E: "외향형 💬", S: "안정형 ⚖️", O: "개방형 💡", C: "성실형 📘" };
+  resultSummary.textContent = `당신은 ${typeMap[top]} 성향이 강합니다.`;
+  traitDesc.textContent = {
+    E: "사람들과의 교류를 통해 에너지를 얻고 활발히 활동합니다.",
+    S: "안정과 신중함을 중시하며 차분하게 행동합니다.",
+    O: "새로운 아이디어와 경험을 추구하는 창의적 사고를 가집니다.",
+    C: "책임감 있고 계획적으로 목표를 달성합니다."
   }[top];
   drawChart();
 }
 
-function drawChart(){
-  const ctx=resultChart.getContext('2d');
-  new Chart(ctx,{type:'radar',data:{
-    labels:['E','S','O','C'],
-    datasets:[{label:'나의 성향',data:[scores.E,scores.S,scores.O,scores.C],
-      backgroundColor:'rgba(99,102,241,0.2)',borderColor:'#6366f1'}]
-  },options:{scales:{r:{suggestedMin:0,suggestedMax:5}}}});
+function drawChart() {
+  const ctx = resultChart.getContext("2d");
+  new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: ["E 💬", "S ⚖️", "O 💡", "C 📘"],
+      datasets: [{
+        label: "나의 성향",
+        data: [scores.E, scores.S, scores.O, scores.C],
+        backgroundColor: "rgba(99,102,241,0.2)",
+        borderColor: "#6366f1",
+        pointBackgroundColor: "#6366f1"
+      }]
+    },
+    options: { scales: { r: { suggestedMin: 0, suggestedMax: 5 } } }
+  });
 }
 </script>
 </body>
