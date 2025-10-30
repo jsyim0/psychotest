@@ -4,591 +4,173 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>심리테스트 — 다중 시각화 (E/S/O/C)</title>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
   :root{
     --accent:#6366f1;
     --bg-light:linear-gradient(120deg,#eef2ff,#e0e7ff);
-    --bg-dark:linear-gradient(120deg,#0f172a,#1e293b);
     --card-light:#ffffff;
-    --card-dark:rgba(17,24,39,0.9);
     --text-dark:#0f172a;
-    --text-light:#f8fafc;
   }
-  html,body{height:100%; margin:0; font-family:Inter, "Pretendard", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  body {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:var(--bg-light);
-    transition: background .4s ease, color .3s ease;
-  }
-  body.dark{background:var(--bg-dark); color:var(--text-light);}
-
-  .card{
-    width:100%; max-width:900px;
-    border-radius:16px;
-    background:var(--card-light);
-    box-shadow:0 10px 30px rgba(2,6,23,0.08);
-    padding:20px;
-    transition: background .3s ease, color .3s ease;
-  }
-  body.dark .card{ background:var(--card-dark); color:var(--text-light); box-shadow:0 8px 30px rgba(2,6,23,0.5); }
-
-  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:12px; }
-  header h1{ margin:0; font-size:1.2rem; background:linear-gradient(45deg,#4f46e5,#8b5cf6); -webkit-background-clip:text; color:transparent; }
-  .meta { display:flex; gap:8px; align-items:center; }
-
-  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
-  select, .btn {
-    padding:8px 12px; border-radius:10px; border:1px solid #e6e9f2; background:transparent;
-    font-size:0.95rem;
-  }
-  .btn { background:var(--accent); color:white; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(99,102,241,0.12); }
-  .btn:active{ transform:translateY(1px); }
-
-  main { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
-
-  /* left: quiz area */
-  .quiz {
-    flex:1 1 360px; min-width:280px;
-  }
-  .start-box, .question-card, .result-card {
-    border-radius:12px; padding:14px; background:rgba(255,255,255,0.97);
-    box-shadow:0 6px 18px rgba(2,6,23,0.04);
-  }
-  body.dark .start-box, body.dark .question-card, body.dark .result-card { background: rgba(255,255,255,0.03); }
-
-  .intro { color:#475569; margin:6px 0 12px 0; font-size:0.95rem; line-height:1.4; }
-  .question-title{ font-weight:700; margin:8px 0; font-size:1rem; }
-
-  .choices { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
-  .choice {
-    padding:12px 14px; border-radius:10px; cursor:pointer; user-select:none;
-    background: #f8fafc; color:var(--text-dark); border:1px solid transparent;
-    transition: all .18s ease;
-  }
-  .choice:hover{ transform:translateY(-3px); border-color:rgba(99,102,241,0.15); background:#eef2ff; color:#1e3a8a; }
-  .choice.selected{ background: linear-gradient(90deg,#6366f1,#a78bfa); color:white; transform:scale(1.02); box-shadow:0 8px 20px rgba(99,102,241,0.12); }
-
-  /* progress */
-  .progress{ height:10px; background:#eef2ff; border-radius:999px; margin:12px 0; overflow:hidden; }
-  .progress > .fill{ height:100%; width:0%; background:linear-gradient(90deg,#6366f1,#8b5cf6); transition:width .3s ease; }
-
-  /* right: visualization area */
-  .visual {
-    width:360px; flex:0 0 360px; min-width:260px;
-    display:flex; flex-direction:column; gap:12px;
-  }
-  .chart-wrap{ border-radius:12px; padding:12px; background:rgba(255,255,255,0.98); box-shadow:0 6px 18px rgba(2,6,23,0.04); height:360px; display:flex; flex-direction:column; }
-  body.dark .chart-wrap { background: rgba(255,255,255,0.03); }
-
-  .chart-controls { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
-  .chart-controls label{ font-size:0.9rem; color: #334155; }
-  body.dark .chart-controls label{ color:#cbd5e1; }
-
-  .small{ font-size:0.9rem; color:#64748b; }
-  body.dark .small{ color:#cbd5e1; }
-
-  /* responsive */
-  @media (max-width:980px) {
-    main{ flex-direction:column-reverse; align-items:stretch; }
-    .visual{ width:100%; flex:1 1 auto; min-width:unset; }
-  }
+  body{font-family:Inter,"Pretendard","Noto Sans KR",system-ui; background:var(--bg-light); margin:0; padding:20px; display:flex; justify-content:center;}
+  .card{max-width:900px;width:100%;background:var(--card-light);border-radius:16px;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  header h1{margin:0;font-size:1.3rem;background:linear-gradient(45deg,#4f46e5,#8b5cf6);-webkit-background-clip:text;color:transparent;}
+  .btn{background:var(--accent);color:white;border:none;border-radius:10px;padding:8px 12px;cursor:pointer;}
+  main{display:flex;gap:18px;flex-wrap:wrap;}
+  .quiz{flex:1 1 360px;min-width:280px;}
+  .start-box{border-radius:12px;padding:16px;background:white;box-shadow:0 6px 18px rgba(2,6,23,0.06);}
+  .trait-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .trait{border-radius:12px;padding:10px;text-align:center;font-size:0.9rem;box-shadow:0 3px 8px rgba(0,0,0,0.05);}
+  .E{background:#eff6ff;color:#1d4ed8;}
+  .S{background:#f0fdf4;color:#15803d;}
+  .O{background:#fff7ed;color:#c2410c;}
+  .C{background:#f5f3ff;color:#6d28d9;}
+  .question-card,.result-card{display:none;background:white;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(2,6,23,0.06);}
+  .choices{display:flex;flex-direction:column;gap:10px;}
+  .choice{padding:10px;border-radius:8px;background:#f8fafc;cursor:pointer;}
+  .choice:hover{background:#eef2ff;}
+  .result-detail{margin-top:10px;font-size:0.9rem;line-height:1.4;color:#475569;}
+  .trait-summary{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.9rem;}
+  .trait-summary div{padding:6px 8px;border-radius:8px;background:#f8fafc;}
+  .visual{width:340px;flex:0 0 340px;min-width:260px;}
 </style>
 </head>
 <body>
-  <div class="card" role="application" aria-label="심리테스트">
+  <div class="card">
     <header>
       <h1>심리테스트 — 다양한 시각화</h1>
-      <div class="meta">
-        <div class="controls">
-          <select id="langSelect" aria-label="언어 선택"></select>
-          <button class="btn" id="startBtn">시작</button>
-        </div>
-      </div>
+      <div><select id="langSelect"></select> <button class="btn" id="startBtn">시작</button></div>
     </header>
-
     <main>
-      <!-- QUIZ COLUMN -->
       <section class="quiz">
+        <!-- ✅ 시작 페이지 개선 -->
         <div id="startBox" class="start-box">
-          <p class="intro" id="introText">질문에 답하면 E/S/O/C 성향을 분석해 드립니다. 언어를 선택한 뒤 시작하세요.</p>
-          <div class="small">음성 안내가 지원되면 자동으로 읽어줍니다.</div>
+          <p id="introText">질문에 답하면 E/S/O/C 성향을 분석해 드립니다.<br>언어를 선택한 뒤 시작하세요.</p>
+          <div class="trait-cards">
+            <div class="trait E"><strong>E</strong> — 외향성<br><small>사람들과의 교류를 즐기며 활발한 성향</small></div>
+            <div class="trait S"><strong>S</strong> — 안정성<br><small>조용하고 안정된 환경을 선호하는 성향</small></div>
+            <div class="trait O"><strong>O</strong> — 개방성<br><small>새로움을 추구하고 창의적인 사고를 하는 성향</small></div>
+            <div class="trait C"><strong>C</strong> — 성실성<br><small>체계적이고 계획적으로 행동하는 성향</small></div>
+          </div>
         </div>
 
-        <div id="questionCard" class="question-card" style="display:none; margin-top:12px;">
-          <div class="progress"><div class="fill" id="progressFill"></div></div>
-          <div class="question-title" id="questionTitle">질문</div>
+        <!-- 질문 카드 -->
+        <div id="questionCard" class="question-card">
+          <div class="progress"><div id="progressFill" style="height:10px;background:#6366f1;width:0%;border-radius:10px;"></div></div>
+          <div id="questionTitle" style="font-weight:bold;"></div>
           <div class="choices" id="choices"></div>
         </div>
 
-        <div id="resultCard" class="result-card" style="display:none; margin-top:12px;">
+        <!-- ✅ 결과 카드 개선 -->
+        <div id="resultCard" class="result-card">
           <h3 id="resultTitle">결과</h3>
-          <p id="resultSummary" class="small"></p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-            <button class="btn" id="downloadBtn">차트 이미지 저장</button>
-            <button class="btn" id="shareBtn">공유</button>
+          <p id="resultSummary"></p>
+          <div class="result-detail" id="traitDesc"></div>
+          <div class="trait-summary">
+            <div class="E">E — 외향성: 활발하고 리더십이 강함</div>
+            <div class="S">S — 안정성: 차분하고 신중한 성향</div>
+            <div class="O">O — 개방성: 호기심 많고 창의적</div>
+            <div class="C">C — 성실성: 꼼꼼하고 책임감이 강함</div>
+          </div>
+          <div style="margin-top:10px;">
             <button class="btn" id="restartBtn">다시하기</button>
           </div>
         </div>
       </section>
 
-      <!-- VISUAL COLUMN -->
+      <!-- 차트 -->
       <aside class="visual">
-        <div class="chart-wrap">
-          <div class="chart-controls">
-            <label for="chartType">그래프 유형:</label>
-            <select id="chartType" aria-label="차트 유형">
-              <option value="bar">막대(Bar)</option>
-              <option value="radar">레이더(Radar)</option>
-              <option value="doughnut">도넛(Doughnut)</option>
-              <option value="pie">파이(Pie)</option>
-            </select>
-
-            <label style="margin-left:8px;"><input type="checkbox" id="compareAvg"> 평균과 비교</label>
-            <div style="flex:1"></div>
-            <div class="small" id="chartHint">차트는 결과 완료 후 자동으로 표시됩니다.</div>
-          </div>
-
-          <div style="flex:1; position:relative;">
-            <canvas id="resultChart" aria-label="결과 차트" role="img" style="width:100%; height:100%;"></canvas>
-          </div>
-        </div>
-
-        <div style="text-align:center;" class="small">※ 다양한 그래프로 결과를 확인해보세요.</div>
+        <canvas id="resultChart" style="width:100%;height:360px;"></canvas>
       </aside>
     </main>
   </div>
 
 <script>
-/* ==========================
-   다국어 질문 데이터 (완전한 문장형)
-   각 언어별로 동일한 의미의 질문/선택지 제공
-   ========================== */
+/* ===== 질문 데이터 ===== */
 const QUESTIONS_BY_LANG = {
   ko: [
-    { q: "주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?",
-      c: [["누구보다 먼저 참여 의사를 밝힌다","E"],["조용히 상황을 지켜본다","S"],["새롭고 재미있는 활동을 제안한다","O"],["일정을 꼼꼼히 확인한 후 결정한다","C"]] },
-    { q: "낯선 사람들과 함께 있을 때, 당신의 행동은 어떤가요?",
-      c: [["먼저 말을 걸며 분위기를 이끈다","E"],["필요할 때만 조용히 말한다","S"],["새로운 대화 주제를 제시한다","O"],["말하기 전 상대의 반응을 살핀다","C"]] },
-    { q: "새로운 일을 맡게 되었을 때, 당신은 어떻게 시작하나요?",
-      c: [["사람들과 협력하며 진행한다","E"],["계획을 세우고 차근차근 해나간다","C"],["즉흥적으로 시도하며 배워나간다","O"],["지침을 충분히 숙지한 후 진행한다","S"]] },
-    { q: "여행을 준비할 때, 당신이 가장 중요하게 생각하는 것은 무엇인가요?",
-      c: [["모두가 함께 즐길 수 있는 일정","E"],["편안하고 안정적인 숙소","S"],["새로운 경험과 모험","O"],["세부 일정과 계획","C"]] },
-    { q: "모임에서 의견이 나뉠 때, 당신은 어떻게 행동하나요?",
-      c: [["분위기를 이끌며 타협점을 찾는다","E"],["조용히 상황을 지켜보며 판단한다","S"],["창의적인 해결책을 제시한다","O"],["논리적으로 근거를 제시한다","C"]] }
-  ],
-  en: [
-    { q: "When friends plan a weekend activity, how do you usually react?",
-      c: [["I volunteer to take the lead","E"],["I prefer to observe quietly","S"],["I suggest something new and fun","O"],["I check the schedule carefully before deciding","C"]] },
-    { q: "When you are with strangers, how do you behave?",
-      c: [["I start conversations and lead the mood","E"],["I speak only when necessary","S"],["I bring up new topics to talk about","O"],["I observe reactions before speaking","C"]] },
-    { q: "When assigned a new task, how do you get started?",
-      c: [["I collaborate with others","E"],["I plan and proceed step by step","C"],["I try things spontaneously and learn","O"],["I study the guidelines thoroughly then proceed","S"]] },
-    { q: "When preparing a trip, what matters most to you?",
-      c: [["An itinerary everyone can enjoy","E"],["Comfortable and stable lodging","S"],["New experiences and adventure","O"],["Detailed schedule and planning","C"]] },
-    { q: "When opinions split in a meeting, how do you act?",
-      c: [["I lead and find compromises","E"],["I quietly assess and decide","S"],["I propose creative solutions","O"],["I present logical evidence","C"]] }
-  ],
-  ja: [
-    { q: "週末に友達が予定を立てるとき、あなたはどう反応しますか？",
-      c: [["率先して計画を立てる","E"],["静かに様子を見る","S"],["新しくて楽しい案を提案する","O"],["予定をよく確認してから決める","C"]] },
-    { q: "知らない人と一緒にいるとき、あなたはどう振る舞いますか？",
-      c: [["自分から話しかけて場を盛り上げる","E"],["必要なときだけ話す","S"],["新しい話題を提供する","O"],["話す前に相手の反応を観察する","C"]] },
-    { q: "新しい仕事を任されたとき、どう始めますか？",
-      c: [["人と協力して進める","E"],["計画を立てて着実に進める","C"],["即興で試しながら学ぶ","O"],["指示を十分に理解してから進める","S"]] },
-    { q: "旅行を準備するとき、あなたが重視することは何ですか？",
-      c: [["皆で楽しめるスケジュール","E"],["快適で安定した宿泊","S"],["新しい体験と冒険","O"],["詳細な予定と計画","C"]] },
-    { q: "会議で意見が分かれたとき、どう行動しますか？",
-      c: [["場をリードして妥協点を見つける","E"],["静かに判断する","S"],["創造的な解決策を提案する","O"],["論理的に根拠を示す","C"]] }
-  ],
-  fr: [
-    { q: "Quand des amis planifient un week-end, comment réagissez-vous ?",
-      c: [["Je prends l'initiative","E"],["J'observe tranquillement","S"],["Je propose quelque chose de nouveau et amusant","O"],["Je vérifie l'emploi du temps avant de décider","C"]] },
-    { q: "Avec des inconnus, comment vous comportez-vous ?",
-      c: [["J'engage la conversation et anime l'ambiance","E"],["Je parle seulement si nécessaire","S"],["Je propose de nouveaux sujets","O"],["J'observe les réactions avant de parler","C"]] },
-    { q: "Lorsque vous avez une nouvelle mission, comment commencez-vous ?",
-      c: [["Je collabore avec les autres","E"],["Je planifie et avance étape par étape","C"],["J'essaie spontanément et j'apprends","O"],["Je lis attentivement les consignes puis j'agis","S"]] },
-    { q: "En préparant un voyage, qu'est-ce qui compte le plus ?",
-      c: [["Un itinéraire que tout le monde apprécie","E"],["Un hébergement confortable et stable","S"],["De nouvelles expériences et de l'aventure","O"],["Un planning détaillé","C"]] },
-    { q: "Si les avis divergent en réunion, que faites-vous ?",
-      c: [["Je mène et trouve un compromis","E"],["J'observe et juge calmement","S"],["Je propose des solutions créatives","O"],["Je présente des arguments logiques","C"]] }
-  ],
-  es: [
-    { q: "Cuando amigos planean el fin de semana, ¿cómo reaccionas?",
-      c: [["Tomo la iniciativa","E"],["Observo en silencio","S"],["Propongo algo nuevo y divertido","O"],["Reviso el horario antes de decidir","C"]] },
-    { q: "Con personas desconocidas, ¿cómo te comportas?",
-      c: [["Inicio la conversación y animo el ambiente","E"],["Hablo sólo si es necesario","S"],["Propongo nuevos temas","O"],["Observo las reacciones antes de hablar","C"]] },
-    { q: "Al recibir una nueva tarea, ¿cómo empiezas?",
-      c: [["Colaboro con otros","E"],["Planifico y avanzo paso a paso","C"],["Pruebo espontáneamente y aprendo","O"],["Estudio las instrucciones y luego actúo","S"]] },
-    { q: "Al preparar un viaje, ¿qué te importa más?",
-      c: [["Un itinerario para que todos disfruten","E"],["Alojamiento cómodo y estable","S"],["Nuevas experiencias y aventuras","O"],["Un plan detallado","C"]] },
-    { q: "Si hay opiniones divididas en una reunión, ¿qué haces?",
-      c: [["Lidero y busco un compromiso","E"],["Evalúo tranquilamente","S"],["Propongo soluciones creativas","O"],["Presento argumentos lógicos","C"]] }
+    { q:"주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?",
+      c:[["먼저 참여 의사를 밝힌다","E"],["조용히 상황을 지켜본다","S"],["새로운 활동을 제안한다","O"],["일정을 꼼꼼히 확인한다","C"]] },
+    { q:"낯선 사람들과 있을 때 당신의 행동은?",
+      c:[["먼저 말을 건다","E"],["필요할 때만 말한다","S"],["새로운 주제를 제시한다","O"],["상대 반응을 살핀다","C"]] },
+    { q:"새로운 일을 맡게 되었을 때 어떻게 시작하나요?",
+      c:[["협력하며 진행한다","E"],["계획을 세운다","C"],["즉흥적으로 시도한다","O"],["지침을 숙지한 후 진행한다","S"]] },
+    { q:"여행을 준비할 때 가장 중요하게 생각하는 것은?",
+      c:[["모두가 즐길 일정","E"],["편안한 숙소","S"],["새로운 경험","O"],["세부 계획","C"]] },
+    { q:"모임에서 의견이 나뉠 때 당신은?",
+      c:[["분위기를 이끌며 조율한다","E"],["조용히 판단한다","S"],["창의적 해결책을 제시한다","O"],["논리적으로 근거를 제시한다","C"]] }
   ]
 };
 
-/* ---------- 앱 상태 ---------- */
-let lang = 'ko';
-let questions = [];
-let selectedQuestions = [];
-let qIndex = 0;
-let scores = {E:0,S:0,O:0,C:0};
-let chartInstance = null;
-let currentChartType = 'bar';
-let compareAverage = false;
+let lang='ko',qIndex=0,scores={E:0,S:0,O:0,C:0},questions=[];
+const langSelect=document.getElementById('langSelect'),
+startBtn=document.getElementById('startBtn'),
+startBox=document.getElementById('startBox'),
+questionCard=document.getElementById('questionCard'),
+choicesDiv=document.getElementById('choices'),
+questionTitle=document.getElementById('questionTitle'),
+progressFill=document.getElementById('progressFill'),
+resultCard=document.getElementById('resultCard'),
+resultSummary=document.getElementById('resultSummary'),
+traitDesc=document.getElementById('traitDesc'),
+resultChart=document.getElementById('resultChart'),
+restartBtn=document.getElementById('restartBtn');
 
-/* ---------- 유틸: DOM ---------- */
-const langSelect = document.getElementById('langSelect');
-const startBtn = document.getElementById('startBtn');
-const introText = document.getElementById('introText');
-const startBox = document.getElementById('startBox');
-const questionCard = document.getElementById('questionCard');
-const questionTitle = document.getElementById('questionTitle');
-const choicesDiv = document.getElementById('choices');
-const progressFill = document.getElementById('progressFill');
-const resultCard = document.getElementById('resultCard');
-const resultTitle = document.getElementById('resultTitle');
-const resultSummary = document.getElementById('resultSummary');
-const chartTypeSelect = document.getElementById('chartType');
-const compareCheckbox = document.getElementById('compareAvg');
-const downloadBtn = document.getElementById('downloadBtn');
-const shareBtn = document.getElementById('shareBtn');
-const restartBtn = document.getElementById('restartBtn');
-const resultChartCanvas = document.getElementById('resultChart');
-
-/* ---------- 초기화: 언어 선택 옵션 채우기 & 자동감지 ---------- */
-function initLangOptions(){
-  const langs = Object.keys(QUESTIONS_BY_LANG);
-  langSelect.innerHTML = '';
-  langs.forEach(l=>{
-    const opt = document.createElement('option');
-    opt.value = l;
-    opt.innerText = {ko:'한국어',en:'English',ja:'日本語',fr:'Français',es:'Español'}[l] || l;
-    langSelect.appendChild(opt);
-  });
-
-  // 자동 감지
-  const userLang = navigator.language ? navigator.language.slice(0,2) : 'ko';
-  if(QUESTIONS_BY_LANG[userLang]) lang = userLang;
-  langSelect.value = lang;
-  applyLangTexts();
-}
-function applyLangTexts(){
-  const intro = {
-    ko: "질문에 답하면 E/S/O/C 성향을 분석해 드립니다. 언어를 선택한 뒤 시작하세요.",
-    en: "Answer the questions to analyze your E/S/O/C traits. Choose a language and start.",
-    ja: "質問に答えると E/S/O/C の傾向を分析します。言語を選んで開始してください。",
-    fr: "Répondez aux questions pour analyser vos traits E/S/O/C. Choisissez la langue et démarrez.",
-    es: "Responde las preguntas para analizar tus rasgos E/S/O/C. Elige el idioma y comienza."
-  }[lang] || '';
-  introText.innerText = intro;
-  startBtn.innerText = {ko:'시작',en:'Start',ja:'開始',fr:'Commencer',es:'Comenzar'}[lang] || 'Start';
-  resultTitle.innerText = {ko:'결과',en:'Result',ja:'結果',fr:'Résultat',es:'Resultado'}[lang] || 'Result';
-}
-
-/* ---------- 시작 로직 ---------- */
-startBtn.addEventListener('click', startQuiz);
-langSelect.addEventListener('change', e=>{ lang = e.target.value; applyLangTexts(); });
+langSelect.innerHTML='<option value="ko">한국어</option>';
+startBtn.onclick=startQuiz;
+restartBtn.onclick=()=>location.reload();
 
 function startQuiz(){
-  // 초기화
-  questions = QUESTIONS_BY_LANG[lang];
-  selectedQuestions = shuffle(questions).slice(0,5);
-  qIndex = 0;
-  scores = {E:0,S:0,O:0,C:0};
-  startBox.style.display = 'none';
-  questionCard.style.display = 'block';
-  resultCard.style.display = 'none';
-  progressFill.style.width = '0%';
-  speakLocalizedIntro();
+  questions=QUESTIONS_BY_LANG[lang];
+  qIndex=0;scores={E:0,S:0,O:0,C:0};
+  startBox.style.display='none';questionCard.style.display='block';
   showQuestion();
 }
 
-/* ---------- 질문 렌더링 ---------- */
 function showQuestion(){
-  const q = selectedQuestions[qIndex];
-  questionTitle.innerText = `(${qIndex+1}/${selectedQuestions.length}) ${q.q}`;
-  choicesDiv.innerHTML = '';
-  const shuffled = shuffle(q.c);
-  shuffled.forEach(([txt, trait], idx)=>{
-    const div = document.createElement('div');
-    div.className = 'choice';
-    div.tabIndex = 0;
-    div.innerText = txt;
-    div.onclick = (ev) => { onChoiceSelected(div, trait); };
-    div.onkeydown = (ev) => { if(ev.key === 'Enter' || ev.key === ' ') onChoiceSelected(div, trait); };
+  const q=questions[qIndex];
+  questionTitle.textContent=`(${qIndex+1}/${questions.length}) ${q.q}`;
+  choicesDiv.innerHTML='';
+  q.c.forEach(([text,trait])=>{
+    const div=document.createElement('div');
+    div.className='choice';div.textContent=text;
+    div.onclick=()=>{scores[trait]++;nextQ();};
     choicesDiv.appendChild(div);
   });
-  progressFill.style.width = `${(qIndex / selectedQuestions.length) * 100}%`;
-  speak(q.q);
+  progressFill.style.width=`${(qIndex/questions.length)*100}%`;
 }
 
-/* ---------- 선택 처리 ---------- */
-function onChoiceSelected(div, trait){
-  // UI 피드백
-  const nodes = choicesDiv.querySelectorAll('.choice');
-  nodes.forEach(n=>n.classList.remove('selected'));
-  div.classList.add('selected');
-
-  setTimeout(()=>{
-    scores[trait] = (scores[trait] || 0) + 1;
-    qIndex++;
-    if(qIndex < selectedQuestions.length) showQuestion();
-    else finishQuiz();
-  }, 240);
+function nextQ(){
+  qIndex++;
+  if(qIndex<questions.length) showQuestion();
+  else finishQuiz();
 }
 
-/* ---------- 결과 처리 ---------- */
 function finishQuiz(){
-  questionCard.style.display = 'none';
-  resultCard.style.display = 'block';
-  progressFill.style.width = '100%';
-
-  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  const top3 = sorted.slice(0,3).map(e=>e[0]).join('');
-  const desc = getDescriptionByType(top3);
-  resultSummary.innerText = {
-    ko: `유형: ${top3} — ${desc}`,
-    en: `Type: ${top3} — ${desc}`,
-    ja: `タイプ: ${top3} — ${desc}`,
-    fr: `Type: ${top3} — ${desc}`,
-    es: `Tipo: ${top3} — ${desc}`
-  }[lang] || `Type: ${top3} — ${desc}`;
-
-  // prepare data for chart
-  const scoresForChart = { ...scores }; // E,S,O,C
-  currentChartType = chartTypeSelect.value || 'bar';
-  compareAverage = compareCheckbox.checked;
-  renderResultChart(scoresForChart, currentChartType, compareAverage);
-  speakResult(top3, desc);
+  questionCard.style.display='none';resultCard.style.display='block';
+  progressFill.style.width='100%';
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0][0];
+  const typeMap={E:"외향형",S:"안정형",O:"개방형",C:"성실형"};
+  resultSummary.textContent=`당신은 ${typeMap[top]} 성향이 강합니다.`;
+  traitDesc.textContent={
+    E:"사람들과의 교류를 통해 에너지를 얻고 활발히 활동합니다.",
+    S:"안정과 신중함을 중시하며 차분하게 행동합니다.",
+    O:"새로운 아이디어와 경험을 추구하는 창의적 사고를 가집니다.",
+    C:"책임감 있고 계획적으로 목표를 달성합니다."
+  }[top];
+  drawChart();
 }
 
-/* ---------- 차트 렌더링 ---------- */
-function getChartColors(dark=false){
-  // E,S,O,C colors
-  if(!dark) return ['#4A90E2','#7ED321','#F5A623','#9013FE'];
-  return ['#60a5fa','#34d399','#f59e0b','#a78bfa'];
+function drawChart(){
+  const ctx=resultChart.getContext('2d');
+  new Chart(ctx,{type:'radar',data:{
+    labels:['E','S','O','C'],
+    datasets:[{label:'나의 성향',data:[scores.E,scores.S,scores.O,scores.C],
+      backgroundColor:'rgba(99,102,241,0.2)',borderColor:'#6366f1'}]
+  },options:{scales:{r:{suggestedMin:0,suggestedMax:5}}}});
 }
-
-function renderResultChart(scoresObj, chartType='bar', compare=false){
-  const ctx = resultChartCanvas.getContext('2d');
-  if(chartInstance) chartInstance.destroy();
-
-  const labels = ['E','S','O','C'];
-  const dataValues = labels.map(l => scoresObj[l] || 0);
-  const colors = getChartColors(document.body.classList.contains('dark'));
-
-  const datasets = [
-    {
-      label: (lang==='ko'?'나':'You'),
-      data: dataValues,
-      backgroundColor: colors,
-      borderColor: colors.map(c=>'rgba(255,255,255,0.06)'),
-      borderWidth: 1,
-    }
-  ];
-
-  if(compare){
-    // Example average values (you can replace with real averages)
-    const avgValues = [2.2,1.8,2.4,2.1]; // dummy average values (0-5 scale)
-    datasets.push({
-      label: (lang==='ko'?'평균':'Avg'),
-      data: avgValues,
-      backgroundColor: colors.map(c => hexToRgba(c,0.24)),
-      borderColor: colors,
-      borderWidth: 1,
-    });
-  }
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins:{
-      legend:{ position:'top', labels:{boxWidth:12}},
-      tooltip:{
-        callbacks:{
-          label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y !== undefined ? ctx.parsed.y : ctx.raw}`
-        }
-      },
-      title: {
-        display: true,
-        text: {ko:'당신의 성향 분석', en:'Your trait analysis', ja:'あなたの傾向', fr:'Analyse de vos traits', es:'Análisis de rasgos'}[lang] || 'Result'
-      }
-    },
-    animation:{ duration:1000, easing:'easeOutQuart' }
-  };
-
-  const cfg = {
-    type: chartType,
-    data: { labels: labels, datasets: datasets },
-    options: options
-  };
-
-  // radar chart needs different options: set scales
-  if(chartType === 'radar'){
-    cfg.options = {
-      ...cfg.options,
-      elements: { line: { borderWidth: 2 } },
-      scales: { r: { suggestedMin:0, suggestedMax:5, ticks: { stepSize:1 } } }
-    };
-  } else if(chartType === 'doughnut' || chartType === 'pie'){
-    // doughnut/pie don't use y-axis
-    cfg.options.plugins.tooltip.callbacks.label = ctx => `${ctx.label}: ${ctx.raw}`;
-  } else {
-    cfg.options.scales = { y: { beginAtZero:true, suggestedMax:5, ticks: { stepSize:1 } } };
-  }
-
-  chartInstance = new Chart(ctx, cfg);
-}
-
-/* ---------- 유틸: hex->rgba ---------- */
-function hexToRgba(hex, alpha=0.5){
-  const h = hex.replace('#','');
-  const bigint = parseInt(h,16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
-/* ---------- 공유 / 저장 ---------- */
-downloadBtn.addEventListener('click', ()=>{
-  if(!chartInstance) return alert({ko:'차트가 없습니다',en:'No chart',ja:'チャートがありません'}[lang]);
-  const url = chartInstance.toBase64Image();
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `psychotest_chart_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-});
-
-shareBtn.addEventListener('click', async ()=>{
-  const text = resultSummary.innerText;
-  const url = window.location.href;
-  if(navigator.share){
-    try{ await navigator.share({ title:'심리테스트 결과', text, url }); }
-    catch(e){ console.log('share canceled'); }
-  } else {
-    try{
-      await navigator.clipboard.writeText(`${text}\n${url}`);
-      alert({ko:'결과가 복사되었습니다',en:'Result copied',ja:'結果をコピーしました'}[lang] || 'Copied');
-    }catch(e){
-      alert('Share not supported');
-    }
-  }
-});
-
-/* ---------- 재시작 ---------- */
-restartBtn.addEventListener('click', ()=>{
-  resultCard.style.display = 'none';
-  startBox.style.display = 'block';
-  if(chartInstance) chartInstance.destroy();
-});
-
-/* ---------- 차트 컨트롤 변화 ---------- */
-chartTypeSelect.addEventListener('change', ()=>{
-  currentChartType = chartTypeSelect.value;
-  // re-render if result exists
-  if(resultCard.style.display !== 'none'){
-    renderResultChart(scores, currentChartType, compareCheckbox.checked);
-  }
-});
-compareCheckbox.addEventListener('change', ()=>{
-  compareAverage = compareCheckbox.checked;
-  if(resultCard.style.display !== 'none'){
-    renderResultChart(scores, currentChartType, compareAverage);
-  }
-});
-
-/* ---------- 음성 안내 (TTS) ---------- */
-const isSpeechSupported = 'speechSynthesis' in window;
-function speak(text){
-  if(!isSpeechSupported) return showFallbackToast(text);
-  try{
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    const langMap = {ko:'ko-KR', en:'en-US', ja:'ja-JP', fr:'fr-FR', es:'es-ES'};
-    u.lang = langMap[lang] || 'en-US';
-    u.rate = 1;
-    u.pitch = 1;
-    window.speechSynthesis.speak(u);
-  }catch(e){
-    console.warn('TTS error', e);
-  }
-}
-function speakLocalizedIntro(){
-  const intro = {
-    ko: "테스트를 시작합니다. 질문을 잘 듣고 답해주세요.",
-    en: "Starting the test. Please listen and answer the questions.",
-    ja: "テストを開始します。質問に耳を傾けて回答してください。",
-    fr: "Démarrage du test. Veuillez écouter et répondre aux questions.",
-    es: "Iniciando la prueba. Por favor, escucha y responde las preguntas."
-  }[lang] || '';
-  speak(intro);
-}
-function speakResult(type, desc){
-  const texts = {
-    ko: `결과: ${type}. ${desc}`,
-    en: `Result: ${type}. ${desc}`,
-    ja: `結果: ${type}. ${desc}`,
-    fr: `Résultat: ${type}. ${desc}`,
-    es: `Resultado: ${type}. ${desc}`
-  }[lang] || `Result: ${type}. ${desc}`;
-  speak(texts);
-}
-function showFallbackToast(text){
-  const id = 'tts-fallback';
-  const existing = document.getElementById(id);
-  if(existing) existing.remove();
-  const el = document.createElement('div');
-  el.id = id;
-  el.innerText = `🔈 ${text}`;
-  Object.assign(el.style,{position:'fixed',bottom:'18px',left:'50%',transform:'translateX(-50%)',background:'rgba(2,6,23,0.85)',color:'#fff',padding:'10px 14px',borderRadius:'10px',zIndex:9999});
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),3500);
-}
-
-/* ---------- 설명(타입) ---------- */
-function getDescriptionByType(type){
-  // simple mapping — could be expanded
-  const map = {
-    ko: {
-      EOC: "사교적이며 창의적이고 체계적인 리더형입니다.",
-      ESC: "현실적이며 신뢰받는 협력가형입니다.",
-      EO: "활발하고 아이디어가 풍부한 탐험가형입니다.",
-      SC: "차분하고 책임감 있는 분석가형입니다.",
-      OC: "창의적이고 계획적인 혁신가형입니다."
-    },
-    en: {
-      EOC: "Sociable, creative and organized — a leader type.",
-      ESC: "Practical and reliable — a dependable collaborator.",
-      EO: "Energetic and idea-rich — an explorer type.",
-      SC: "Calm and responsible — an analytical type.",
-      OC: "Creative and methodical — an innovator type."
-    }
-  };
-  // try to find best key match
-  const k = type || '';
-  return map[lang]?.[k] || map['ko']?.[k] || (lang==='en'? "Balanced, multi-trait type.": "균형 잡힌 성향입니다.");
-}
-
-/* ---------- small helpers ---------- */
-function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
-
-/* ---------- init ---------- */
-initLangOptions();
-
-/* ---------- Accessibility: keyboard enter on start ---------- */
-startBtn.addEventListener('keydown', e=>{ if(e.key === 'Enter') startBtn.click(); });
-
 </script>
 </body>
 </html>
