@@ -3,40 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>성향 심리테스트</title>
+  <title>심리테스트 - E/S/O/C</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div id="start-page" class="page active">
-      <h1>성향 심리테스트</h1>
-      <p>당신의 성향을 알아보세요!</p>
+  <div id="startPage" class="page">
+    <h1>심리테스트</h1>
+    <select id="language">
+      <option value="ko">한국어</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="zh">中文</option>
+    </select>
+    <button id="startBtn">시작하기</button>
+  </div>
 
-      <div class="language-select">
-        <label for="language">언어 선택:</label>
-        <select id="language">
-          <option value="ko">한국어</option>
-          <option value="en">English</option>
-          <option value="jp">日本語</option>
-          <option value="zh">中文</option>
-          <option value="es">Español</option>
-        </select>
-      </div>
+  <div id="quizPage" class="page" style="display:none;">
+    <h2 id="questionText"></h2>
+    <div id="choices"></div>
+  </div>
 
-      <button id="start-btn">시작하기</button>
-    </div>
-
-    <div id="quiz-page" class="page">
-      <div id="question-container"></div>
-      <button id="next-btn">다음</button>
-    </div>
-
-    <div id="result-page" class="page">
-      <h2>결과</h2>
+  <div id="resultPage" class="page" style="display:none;">
+    <h2>결과</h2>
+    <p id="resultText"></p>
+    <div class="chart-container">
       <canvas id="resultChart"></canvas>
-      <div id="result-text"></div>
-      <button id="restart-btn">다시하기</button>
     </div>
   </div>
 

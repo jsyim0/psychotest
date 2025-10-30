@@ -1,58 +1,46 @@
 body {
+  background-color: #121212;
+  color: #fff;
   font-family: 'Pretendard', sans-serif;
-  background-color: #0a0a1a;
-  color: #f0f0ff;
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
-
-.container {
   text-align: center;
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 90%;
   max-width: 600px;
 }
-
 button {
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-size: 1rem;
-  border-radius: 8px;
-  cursor: pointer;
   margin-top: 20px;
+  padding: 10px 20px;
+  background: #1e88e5;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
-
 button:hover {
-  background-color: #6366f1;
+  background: #1565c0;
 }
-
-.page {
-  display: none;
-}
-
-.page.active {
+#choices button {
   display: block;
+  margin: 10px 0;
+  width: 100%;
+  text-align: center;
 }
-
-.language-select {
-  margin: 20px 0;
-}
-
-#result-page {
-  margin-top: 40px;
-}
-
-canvas {
-  max-width: 100%;
-  margin: 20px auto;
-}
-
-#result-text {
-  margin-top: 30px;
-  line-height: 1.6;
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: 400px;
+  margin-top: 20px;
 }
