@@ -1,157 +1,96 @@
 :root {
-  --accent: #818cf8;
-  --bg: linear-gradient(160deg, #0f172a, #1e293b);
-  --card: #1e293b;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --accent: #6366f1;
   --text: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #334155;
-  --maxw: 980px;
 }
-
-* { box-sizing: border-box; }
 
 body {
-  font-family: Inter, "Noto Sans KR", system-ui;
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  background: var(--bg);
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
   color: var(--text);
-}
-
-.card {
-  width: 100%;
-  max-width: var(--maxw);
-  background: var(--card);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 header {
+  padding: 20px;
+  background-color: #1e293b;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
 h1 {
   margin: 0;
-  font-size: 1.3rem;
-  background: linear-gradient(45deg, #a78bfa, #818cf8);
-  -webkit-background-clip: text;
-  color: transparent;
+  font-size: 1.5rem;
 }
 
-#headerControls { display: flex; gap: 8px; align-items: center; }
-
-select, button {
-  font-size: 0.95rem;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: #0f172a;
-  color: var(--text);
-}
-
-select:hover, button:hover { border-color: var(--accent); }
-
-button.btn {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(99,102,241,0.3);
-}
-button.btn:hover { background: #6366f1; }
-
-main { display: flex; gap: 16px; flex-wrap: wrap; }
-.quiz { flex: 1 1 420px; min-width: 280px; }
-
-.start-box, .question-card, .result-card {
-  border-radius: 12px;
-  padding: 14px;
-  background: #0f172a;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-}
-
-.intro { color: var(--muted); margin: 6px 0 12px; font-size: 0.95rem; line-height: 1.4; }
-
-.trait-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+#headerControls {
+  display: flex;
   gap: 10px;
-  margin-top: 12px;
 }
 
-.trait {
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #fff;
-}
-.E { background: #1e3a8a; }
-.S { background: #065f46; }
-.O { background: #78350f; }
-.C { background: #5b21b6; }
-
-.progress {
-  height: 10px;
-  background: #334155;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-.progress > .fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
-  transition: width .3s;
-}
-
-.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.choice {
-  padding: 12px;
-  border-radius: 10px;
-  background: #1e293b;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  transition: all .15s;
+select {
+  appearance: none;
+  background: var(--panel);
   color: var(--text);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
 }
-.choice:hover {
-  transform: translateY(-3px);
-  background: #334155;
+select:hover {
   border-color: var(--accent);
 }
 
-.visual {
-  width: 360px;
-  flex: 0 0 360px;
-  min-width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+main {
+  margin-top: 40px;
 }
 
-.chart-wrap {
-  border-radius: 12px;
-  padding: 12px;
-  background: #0f172a;
-  height: 360px;
+.btn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.2s;
+}
+.btn:hover {
+  opacity: 0.85;
+}
+
+#choices {
   display: flex;
   flex-direction: column;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .6s ease;
+  gap: 10px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 400px;
 }
-.chart-wrap.visible { opacity: 1; pointer-events: auto; }
 
-.small { font-size: 0.9rem; color: var(--muted); }
+.choice {
+  background: var(--panel);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.choice:hover {
+  background: #334155;
+}
 
-@media (max-width: 980px) {
-  main { flex-direction: column-reverse; }
-  .visual { width: 100%; }
+#chartWrap {
+  width: 90%;
+  max-width: 500px;
+  margin: 30px auto;
+  display: none;
+}
+#chartWrap.visible {
+  display: block;
 }
