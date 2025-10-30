@@ -13,133 +13,278 @@
     --maxw:980px;
   }
   *{box-sizing:border-box}
-  body{font-family:Inter, "Noto Sans KR", system-ui; margin:0; padding:20px; display:flex; justify-content:center; background:var(--bg)}
-  .card{width:100%;max-width:var(--maxw);background:var(--card);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.06)}
+  body{font-family:Inter,"Noto Sans KR",system-ui;margin:0;padding:20px;
+       display:flex;justify-content:center;background:var(--bg)}
+  .card{width:100%;max-width:var(--maxw);background:var(--card);
+        border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.06)}
   header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  h1{margin:0;font-size:1.2rem;background:linear-gradient(45deg,#4f46e5,#8b5cf6);-webkit-background-clip:text;color:transparent}
+  h1{margin:0;font-size:1.2rem;background:linear-gradient(45deg,#4f46e5,#8b5cf6);
+     -webkit-background-clip:text;color:transparent}
   #headerControls{display:flex;gap:8px;align-items:center}
-  select,input,button{font-size:0.95rem;padding:8px 10px;border-radius:8px;border:1px solid #e6e9f2;background:transparent}
-  button.btn{background:var(--accent);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(99,102,241,0.12)}
+  select,input,button{font-size:0.95rem;padding:8px 10px;border-radius:8px;
+                      border:1px solid #e6e9f2;background:transparent}
+  button.btn{background:var(--accent);color:#fff;border:none;cursor:pointer;
+             box-shadow:0 6px 18px rgba(99,102,241,0.12)}
   main{display:flex;gap:16px;flex-wrap:wrap}
   .quiz{flex:1 1 420px;min-width:280px}
-  .start-box,.question-card,.result-card{border-radius:12px;padding:14px;background:rgba(255,255,255,0.98);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+  .start-box,.question-card,.result-card{border-radius:12px;padding:14px;
+     background:rgba(255,255,255,0.98);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
   .intro{color:#475569;margin:6px 0 12px;font-size:0.95rem;line-height:1.4}
-  .trait-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  .trait-cards{display:grid;grid-template-columns:repeat(2,1fr);
+               gap:10px;margin-top:12px}
   .trait{border-radius:10px;padding:10px;text-align:center;font-size:0.9rem}
-  .E{background:#eff6ff;color:#1d4ed8} .S{background:#f0fdf4;color:#15803d}
-  .O{background:#fff7ed;color:#c2410c} .C{background:#f5f3ff;color:#6d28d9}
-  .progress{height:10px;background:#eef2ff;border-radius:999px;overflow:hidden;margin:10px 0}
-  .progress > .fill{height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .3s}
+  .E{background:#eff6ff;color:#1d4ed8}
+  .S{background:#f0fdf4;color:#15803d}
+  .O{background:#fff7ed;color:#c2410c}
+  .C{background:#f5f3ff;color:#6d28d9}
+  .progress{height:10px;background:#eef2ff;border-radius:999px;
+            overflow:hidden;margin:10px 0}
+  .progress > .fill{height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);
+                    transition:width .3s}
   .choices{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-  .choice{padding:12px;border-radius:10px;background:#f8fafc;cursor:pointer;border:1px solid transparent;transition:all .15s}
-  .choice:hover{transform:translateY(-3px);background:#eef2ff;border-color:rgba(99,102,241,0.12)}
-  .visual{width:360px;flex:0 0 360px;min-width:260px;display:flex;flex-direction:column;gap:12px}
-  .chart-wrap{border-radius:12px;padding:12px;background:rgba(255,255,255,0.98);height:360px;display:flex;flex-direction:column;
-              opacity:0; pointer-events:none; transition:opacity .5s ease;} /* ✅ 초기 숨김 상태 */
-  .chart-wrap.visible{opacity:1; pointer-events:auto;} /* ✅ 결과 시점에 보이도록 */
+  .choice{padding:12px;border-radius:10px;background:#f8fafc;cursor:pointer;
+          border:1px solid transparent;transition:all .15s}
+  .choice:hover{transform:translateY(-3px);background:#eef2ff;
+                border-color:rgba(99,102,241,0.12)}
+  .visual{width:360px;flex:0 0 360px;min-width:260px;display:flex;
+          flex-direction:column;gap:12px}
+  .chart-wrap{border-radius:12px;padding:12px;background:rgba(255,255,255,0.98);
+              height:360px;display:flex;flex-direction:column;
+              opacity:0;pointer-events:none;transition:opacity .6s ease;}
+  .chart-wrap.visible{opacity:1;pointer-events:auto;}
   .small{font-size:0.9rem;color:#64748b}
   @media(max-width:980px){main{flex-direction:column-reverse}.visual{width:100%}}
 </style>
 </head>
 <body>
-  <div class="card" role="application" aria-label="심리테스트">
-    <header>
-      <h1 id="appTitle">심리테스트 — E/S/O/C</h1>
-      <div id="headerControls">
-        <select id="langSelect" aria-label="언어 선택"></select>
-        <button class="btn" id="startBtn">시작</button>
+<div class="card" role="application" aria-label="심리테스트">
+  <header>
+    <h1 id="appTitle">심리테스트 — E/S/O/C</h1>
+    <div id="headerControls">
+      <select id="langSelect" aria-label="언어 선택"></select>
+      <button class="btn" id="startBtn">시작</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="quiz" aria-live="polite">
+      <div id="startBox" class="start-box">
+        <p id="introText" class="intro">언어를 선택한 뒤 테스트를 시작하세요. 시작하면 언어 선택과 시작 버튼은 숨겨집니다.</p>
+        <div class="trait-cards" role="list">
+          <div class="trait E" role="listitem">💬 <strong>E — 외향성</strong><div class="small">사람들과 어울리며 에너지를 얻는 타입</div></div>
+          <div class="trait S" role="listitem">⚖️ <strong>S — 안정성</strong><div class="small">차분하고 균형을 중시하는 타입</div></div>
+          <div class="trait O" role="listitem">💡 <strong>O — 개방성</strong><div class="small">새롭고 창의적인 것을 즐기는 타입</div></div>
+          <div class="trait C" role="listitem">📘 <strong>C — 성실성</strong><div class="small">계획적이고 책임감 있는 타입</div></div>
+        </div>
       </div>
-    </header>
 
-    <main>
-      <!-- quiz column -->
-      <section class="quiz" aria-live="polite">
-        <div id="startBox" class="start-box">
-          <p id="introText" class="intro">언어를 선택한 뒤 테스트를 시작하세요. 시작하면 언어 선택과 시작 버튼은 숨겨집니다.</p>
-          <div class="trait-cards" role="list">
-            <div class="trait E" role="listitem">💬 <strong>E — 외향성</strong><div class="small">사람들과 어울리며 에너지를 얻는 타입</div></div>
-            <div class="trait S" role="listitem">⚖️ <strong>S — 안정성</strong><div class="small">차분하고 균형을 중시하는 타입</div></div>
-            <div class="trait O" role="listitem">💡 <strong>O — 개방성</strong><div class="small">새롭고 창의적인 것을 즐기는 타입</div></div>
-            <div class="trait C" role="listitem">📘 <strong>C — 성실성</strong><div class="small">계획적이고 책임감 있는 타입</div></div>
-          </div>
-        </div>
+      <div id="questionCard" class="question-card" style="display:none; margin-top:12px;">
+        <div class="progress"><div class="fill" id="progressFill"></div></div>
+        <div id="questionTitle" class="question-title" style="font-weight:700"></div>
+        <div class="choices" id="choices" role="list"></div>
+      </div>
 
-        <div id="questionCard" class="question-card" style="display:none; margin-top:12px;">
-          <div class="progress"><div class="fill" id="progressFill"></div></div>
-          <div id="questionTitle" class="question-title" style="font-weight:700"></div>
-          <div class="choices" id="choices" role="list"></div>
+      <div id="resultCard" class="result-card" style="display:none; margin-top:12px;">
+        <h3 id="resultTitle">결과</h3>
+        <p id="resultSummary" class="small"></p>
+        <div id="traitDetails" style="margin-top:8px"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn" id="restartBtn">다시하기</button>
         </div>
+      </div>
+    </section>
 
-        <div id="resultCard" class="result-card" style="display:none; margin-top:12px;">
-          <h3 id="resultTitle">결과</h3>
-          <p id="resultSummary" class="small"></p>
-          <div id="traitDetails" style="margin-top:8px"></div>
-          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-            <button class="btn" id="restartBtn">다시하기</button>
-          </div>
+    <aside class="visual" aria-hidden="false">
+      <div class="chart-wrap" id="chartWrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="small" id="chartTitle">차트 (레이더)</div>
+          <div class="small" id="chartHint">결과 후 자동 표시</div>
         </div>
-      </section>
-
-      <!-- visualization column -->
-      <aside class="visual" aria-hidden="false">
-        <div class="chart-wrap" id="chartWrap">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div class="small" id="chartTitle">차트 (레이더)</div>
-            <div class="small" id="chartHint">결과 후 자동 표시</div>
-          </div>
-          <div style="flex:1;position:relative;margin-top:8px;">
-            <canvas id="resultChart" role="img" aria-label="결과 차트" style="width:100%;height:100%"></canvas>
-          </div>
+        <div style="flex:1;position:relative;margin-top:8px;">
+          <canvas id="resultChart" role="img" aria-label="결과 차트" style="width:100%;height:100%"></canvas>
         </div>
-        <div class="small" style="text-align:center">아이콘: 💬 E · ⚖️ S · 💡 O · 📘 C</div>
-      </aside>
-    </main>
-  </div>
+      </div>
+      <div class="small" style="text-align:center">아이콘: 💬 E · ⚖️ S · 💡 O · 📘 C</div>
+    </aside>
+  </main>
+</div>
 
 <script>
-/* ... (중략: DATA, TTS, shuffle 등은 동일) ... */
+// ===== 데이터: 다국어 질문/답변 =====
+const DATA = {
+  ko:{
+    questions:[
+      {q:"사람들과 함께 있을 때 에너지가 생긴다.", a:[{text:"매우 그렇다", t:"E"},{text:"보통이다",t:"S"},{text:"아니다",t:"C"}]},
+      {q:"새로운 아이디어를 탐구하는 것을 즐긴다.", a:[{text:"매우 그렇다", t:"O"},{text:"보통이다",t:"S"},{text:"아니다",t:"C"}]},
+      {q:"일정과 계획을 세우는 것을 좋아한다.", a:[{text:"매우 그렇다", t:"C"},{text:"보통이다",t:"S"},{text:"아니다",t:"O"}]},
+      {q:"조용한 환경에서 혼자 집중하는 걸 선호한다.", a:[{text:"매우 그렇다",t:"C"},{text:"보통이다",t:"S"},{text:"아니다",t:"E"}]},
+      {q:"변화보다는 안정된 일상을 선호한다.", a:[{text:"매우 그렇다",t:"S"},{text:"보통이다",t:"C"},{text:"아니다",t:"O"}]}
+    ],
+    labels:{E:"외향성",S:"안정성",O:"개방성",C:"성실성"},
+    traits:{
+      E:"사람들과 어울리며 활력을 얻는 타입입니다.",
+      S:"안정과 균형을 중시하는 타입입니다.",
+      O:"새로움과 창의성을 추구하는 타입입니다.",
+      C:"책임감 있고 계획적인 타입입니다."
+    },
+    ttsIntro:"테스트를 시작합니다.",
+    ttsFinish:"결과입니다."
+  },
+  en:{
+    questions:[
+      {q:"You feel energized when around others.",a:[{text:"Strongly agree",t:"E"},{text:"Neutral",t:"S"},{text:"Disagree",t:"C"}]},
+      {q:"You enjoy exploring new ideas.",a:[{text:"Strongly agree",t:"O"},{text:"Neutral",t:"S"},{text:"Disagree",t:"C"}]},
+      {q:"You like planning and organizing schedules.",a:[{text:"Strongly agree",t:"C"},{text:"Neutral",t:"S"},{text:"Disagree",t:"O"}]},
+      {q:"You prefer focusing alone in quiet settings.",a:[{text:"Strongly agree",t:"C"},{text:"Neutral",t:"S"},{text:"Disagree",t:"E"}]},
+      {q:"You prefer stability over change.",a:[{text:"Strongly agree",t:"S"},{text:"Neutral",t:"C"},{text:"Disagree",t:"O"}]}
+    ],
+    labels:{E:"Extraversion",S:"Stability",O:"Openness",C:"Conscientiousness"},
+    traits:{
+      E:"You gain energy from interacting with people.",
+      S:"You value calmness and balance.",
+      O:"You enjoy novelty and creativity.",
+      C:"You are responsible and organized."
+    },
+    ttsIntro:"Starting the test.",
+    ttsFinish:"Here are your results."
+  },
+  ja:{
+    questions:[
+      {q:"人と一緒にいるとエネルギーが湧く。",a:[{text:"とてもそう思う",t:"E"},{text:"どちらでもない",t:"S"},{text:"そうは思わない",t:"C"}]},
+      {q:"新しいアイデアを探求するのが好きだ。",a:[{text:"とてもそう思う",t:"O"},{text:"どちらでもない",t:"S"},{text:"そうは思わない",t:"C"}]},
+      {q:"計画を立てるのが好きだ。",a:[{text:"とてもそう思う",t:"C"},{text:"どちらでもない",t:"S"},{text:"そうは思わない",t:"O"}]},
+      {q:"静かな環境で集中するのが好きだ。",a:[{text:"とてもそう思う",t:"C"},{text:"どちらでもない",t:"S"},{text:"そうは思わない",t:"E"}]},
+      {q:"変化より安定を好む。",a:[{text:"とてもそう思う",t:"S"},{text:"どちらでもない",t:"C"},{text:"そうは思わない",t:"O"}]}
+    ],
+    labels:{E:"外向性",S:"安定性",O:"開放性",C:"誠実性"},
+    traits:{
+      E:"社交的で人と交流することでエネルギーを得ます。",
+      S:"落ち着きとバランスを大切にするタイプです。",
+      O:"新しいことや創造的なことを楽しみます。",
+      C:"責任感が強く計画的です。"
+    },
+    ttsIntro:"テストを開始します。",
+    ttsFinish:"結果はこちらです。"
+  },
+  es:{
+    questions:[
+      {q:"Te sientes con energía al estar con otros.",a:[{text:"Totalmente de acuerdo",t:"E"},{text:"Neutral",t:"S"},{text:"En desacuerdo",t:"C"}]},
+      {q:"Disfrutas explorando nuevas ideas.",a:[{text:"Totalmente de acuerdo",t:"O"},{text:"Neutral",t:"S"},{text:"En desacuerdo",t:"C"}]},
+      {q:"Te gusta planificar y organizar.",a:[{text:"Totalmente de acuerdo",t:"C"},{text:"Neutral",t:"S"},{text:"En desacuerdo",t:"O"}]},
+      {q:"Prefieres concentrarte solo en entornos tranquilos.",a:[{text:"Totalmente de acuerdo",t:"C"},{text:"Neutral",t:"S"},{text:"En desacuerdo",t:"E"}]},
+      {q:"Prefieres estabilidad a cambios.",a:[{text:"Totalmente de acuerdo",t:"S"},{text:"Neutral",t:"C"},{text:"En desacuerdo",t:"O"}]}
+    ],
+    labels:{E:"Extroversión",S:"Estabilidad",O:"Apertura",C:"Responsabilidad"},
+    traits:{
+      E:"Te energizas al interactuar con la gente.",
+      S:"Valoras la calma y el equilibrio.",
+      O:"Disfrutas de la novedad y la creatividad.",
+      C:"Eres responsable y organizado."
+    },
+    ttsIntro:"Iniciando la prueba.",
+    ttsFinish:"Aquí están tus resultados."
+  }
+};
 
-const chartWrap = document.getElementById('chartWrap'); // ✅ chartWrap 참조 추가
+// ===== 초기 설정 =====
+const langSelect=document.getElementById('langSelect');
+Object.keys(DATA).forEach(k=>{
+  const opt=document.createElement('option');
+  opt.value=k; opt.textContent=k.toUpperCase();
+  langSelect.appendChild(opt);
+});
+let lang='ko', qIndex=0, questions=[], selected=[], scores={E:0,S:0,O:0,C:0};
+langSelect.addEventListener('change',()=>lang=langSelect.value);
+
+const startBtn=document.getElementById('startBtn');
+const headerControls=document.getElementById('headerControls');
+const startBox=document.getElementById('startBox');
+const questionCard=document.getElementById('questionCard');
+const resultCard=document.getElementById('resultCard');
+const questionTitle=document.getElementById('questionTitle');
+const choices=document.getElementById('choices');
+const progressFill=document.getElementById('progressFill');
+const resultTitle=document.getElementById('resultTitle');
+const resultSummary=document.getElementById('resultSummary');
+const traitDetails=document.getElementById('traitDetails');
+const chartWrap=document.getElementById('chartWrap');
+
+function speak(txt){
+  if(!('speechSynthesis' in window)) return;
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang={ko:'ko-KR',en:'en-US',ja:'ja-JP',es:'es-ES'}[lang]||'en-US';
+  u.rate=1; window.speechSynthesis.speak(u);
+}
+
+function shuffle(a){return a.map(v=>[v,Math.random()]).sort((a,b)=>a[1]-b[1]).map(v=>v[0]);}
 
 function startQuiz(){
-  headerControls.style.display = 'none';
-  startBox.style.display = 'none';
-  questionCard.style.display = 'block';
-  resultCard.style.display = 'none';
-  chartWrap.classList.remove('visible'); // ✅ 시작 시 차트 숨김
-  progressFill.style.width = '0%';
-  questions = DATA[lang].questions.slice();
-  selected = shuffle(questions).slice(0,5);
-  qIndex = 0;
-  scores = {E:0,S:0,O:0,C:0};
+  headerControls.style.display='none';
+  startBox.style.display='none';
+  questionCard.style.display='block';
+  resultCard.style.display='none';
+  chartWrap.classList.remove('visible');
+  progressFill.style.width='0%';
+  questions=DATA[lang].questions.slice();
+  selected=shuffle(questions).slice(0,5);
+  qIndex=0; scores={E:0,S:0,O:0,C:0};
   speak(DATA[lang].ttsIntro);
   showQuestion();
 }
 
-function finishQuiz(){
-  questionCard.style.display = 'none';
-  resultCard.style.display = 'block';
-  progressFill.style.width = '100%';
-  const d = DATA[lang];
-  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-  const topMain = sorted[0][0];
-  const top3 = sorted.slice(0,3).map(s=>s[0]).join('');
-  resultTitle.innerText = d.labels[topMain] || topMain;
-  resultSummary.innerText = `${d.traits[topMain] || ''} (${top3})`;
-  traitDetails.innerHTML = Object.entries(d.traits).map(([k,v])=>{
-    const icon = {E:'💬',S:'⚖️',O:'💡',C:'📘'}[k];
-    return `<div style="margin:6px 0;padding:8px;border-radius:8px;background:#f8fafc">${icon} <strong>${k}</strong> — ${v} <span style="float:right;font-weight:700">${scores[k]}</span></div>`;
-  }).join('');
-  renderChart();
-  chartWrap.classList.add('visible'); // ✅ 결과 후 차트 표시
-  speak(d.ttsFinish + ' ' + (d.traits[topMain] || ''));
+function showQuestion(){
+  const q=selected[qIndex];
+  questionTitle.innerText=q.q;
+  choices.innerHTML='';
+  q.a.forEach((c,i)=>{
+    const btn=document.createElement('div');
+    btn.className='choice';
+    btn.innerText=c.text;
+    btn.addEventListener('click',()=>selectAnswer(c.t));
+    choices.appendChild(btn);
+  });
+  progressFill.style.width=((qIndex)/selected.length*100)+'%';
 }
 
-document.getElementById('restartBtn').addEventListener('click', ()=>{
+function selectAnswer(t){
+  scores[t]++;
+  qIndex++;
+  if(qIndex<selected.length) showQuestion();
+  else finishQuiz();
+}
+
+function renderChart(){
+  const ctx=document.getElementById('resultChart');
+  const chartData={labels:Object.keys(scores),
+    datasets:[{label:'점수',data:Object.values(scores),
+      fill:true,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.2)',pointBackgroundColor:'#6366f1'}]};
+  new Chart(ctx,{type:'radar',data:chartData,options:{scales:{r:{min:0,max:5,ticks:{stepSize:1}}}}});
+}
+
+function finishQuiz(){
+  questionCard.style.display='none';
+  resultCard.style.display='block';
+  progressFill.style.width='100%';
+  const d=DATA[lang];
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const topMain=sorted[0][0];
+  const top3=sorted.slice(0,3).map(s=>s[0]).join('');
+  resultTitle.innerText=d.labels[topMain];
+  resultSummary.innerText=`${d.traits[topMain]} (${top3})`;
+  traitDetails.innerHTML=Object.entries(d.traits)
+    .map(([k,v])=>`<div style="margin:6px 0;padding:8px;border-radius:8px;background:#f8fafc">
+    <strong>${k}</strong> — ${v} <span style="float:right;font-weight:700">${scores[k]}</span></div>`).join('');
+  renderChart();
+  chartWrap.classList.add('visible');
+  speak(d.ttsFinish+' '+d.traits[topMain]);
+}
+
+document.getElementById('restartBtn').addEventListener('click',()=>{
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
-  chartWrap.classList.remove('visible'); // ✅ 다시 시작 시 차트 숨김
+  chartWrap.classList.remove('visible');
   location.reload();
 });
+startBtn.addEventListener('click',startQuiz);
 </script>
 </body>
 </html>
