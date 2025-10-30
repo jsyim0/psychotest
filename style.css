@@ -1,5 +1,5 @@
 :root {
-  --accent: #818cf8;          /* 보라빛 메인 포인트 */
+  --accent: #818cf8;
   --bg: linear-gradient(160deg, #0f172a, #1e293b);
   --card: #1e293b;
   --text: #f1f5f9;
@@ -7,7 +7,9 @@
   --border: #334155;
   --maxw: 980px;
 }
+
 * { box-sizing: border-box; }
+
 body {
   font-family: Inter, "Noto Sans KR", system-ui;
   margin: 0;
@@ -17,6 +19,7 @@ body {
   background: var(--bg);
   color: var(--text);
 }
+
 .card {
   width: 100%;
   max-width: var(--maxw);
@@ -25,12 +28,14 @@ body {
   padding: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
+
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
+
 h1 {
   margin: 0;
   font-size: 1.3rem;
@@ -38,11 +43,9 @@ h1 {
   -webkit-background-clip: text;
   color: transparent;
 }
-#headerControls {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
+
+#headerControls { display: flex; gap: 8px; align-items: center; }
+
 select, button {
   font-size: 0.95rem;
   padding: 8px 10px;
@@ -51,6 +54,9 @@ select, button {
   background: #0f172a;
   color: var(--text);
 }
+
+select:hover, button:hover { border-color: var(--accent); }
+
 button.btn {
   background: var(--accent);
   color: #fff;
@@ -58,9 +64,8 @@ button.btn {
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(99,102,241,0.3);
 }
-button.btn:hover {
-  background: #6366f1;
-}
+button.btn:hover { background: #6366f1; }
+
 main { display: flex; gap: 16px; flex-wrap: wrap; }
 .quiz { flex: 1 1 420px; min-width: 280px; }
 
@@ -70,6 +75,7 @@ main { display: flex; gap: 16px; flex-wrap: wrap; }
   background: #0f172a;
   box-shadow: 0 6px 18px rgba(0,0,0,0.3);
 }
+
 .intro { color: var(--muted); margin: 6px 0 12px; font-size: 0.95rem; line-height: 1.4; }
 
 .trait-cards {
@@ -78,6 +84,7 @@ main { display: flex; gap: 16px; flex-wrap: wrap; }
   gap: 10px;
   margin-top: 12px;
 }
+
 .trait {
   border-radius: 10px;
   padding: 10px;
@@ -128,6 +135,7 @@ main { display: flex; gap: 16px; flex-wrap: wrap; }
   flex-direction: column;
   gap: 12px;
 }
+
 .chart-wrap {
   border-radius: 12px;
   padding: 12px;
