@@ -1,39 +1,66 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>심리테스트 - E/S/O/C</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>심리테스트 — E/S/O/C (v4)</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div id="startPage" class="page">
-    <h1>심리테스트</h1>
-    <select id="language">
-      <option value="ko">한국어</option>
-      <option value="en">English</option>
-      <option value="ja">日本語</option>
-      <option value="fr">Français</option>
-      <option value="es">Español</option>
-      <option value="zh">中文</option>
-    </select>
-    <button id="startBtn">시작하기</button>
+  <div class="card">
+    <header>
+      <h1 id="appTitle">심리테스트 — E/S/O/C</h1>
+      <div class="controls">
+        <select id="langSelect" aria-label="언어 선택"></select>
+        <button id="startBtn" class="btn">시작</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="quiz-col">
+        <div id="startBox" class="panel">
+          <p id="introText">언어 선택 후 시작하세요. 시작하면 선택창이 숨겨집니다.</p>
+          <div id="savedBox" class="saved" style="display:none;">
+            <div>저장된 결과가 있습니다.</div>
+            <button id="loadSaved" class="btn small">저장 결과 불러오기</button>
+            <button id="clearSaved" class="btn small">저장 삭제</button>
+          </div>
+        </div>
+
+        <div id="questionCard" class="panel" style="display:none;">
+          <div class="progress"><div id="progressFill" class="fill"></div></div>
+          <div id="questionTitle" class="qtitle"></div>
+          <div id="choices" class="choices"></div>
+        </div>
+
+        <div id="resultCard" class="panel" style="display:none;">
+          <h3 id="resultTitle">결과</h3>
+          <p id="resultSummary" class="small"></p>
+          <div id="traitDetails"></div>
+          <div style="margin-top:8px;">
+            <select id="chartType"><option value="radar">레이더</option><option value="bar">막대</option></select>
+            <button id="saveBtn" class="btn small">저장</button>
+            <button id="shareBtn" class="btn small">공유 링크 복사</button>
+            <button id="restartBtn" class="btn small">다시하기</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="visual-col">
+        <div id="chartWrap" class="chart-wrap" aria-hidden="true">
+          <div class="chart-header">
+            <div class="small">차트</div>
+            <div class="small" id="chartHint">결과 완료 후 표시</div>
+          </div>
+          <div class="chart-area">
+            <canvas id="resultChart" aria-label="결과 차트"></canvas>
+          </div>
+        </div>
+      </aside>
+    </main>
   </div>
 
-  <div id="quizPage" class="page" style="display:none;">
-    <h2 id="questionText"></h2>
-    <div id="choices"></div>
-  </div>
-
-  <div id="resultPage" class="page" style="display:none;">
-    <h2>결과</h2>
-    <p id="resultText"></p>
-    <div class="chart-container">
-      <canvas id="resultChart"></canvas>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
