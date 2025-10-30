@@ -3,257 +3,430 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Personality Test — E/S/O/C Analyzer</title>
+<title>심리테스트 — E/S/O/C (다국어 + TTS)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  :root {
-    --accent: #6366f1;
-    --bg-light: linear-gradient(120deg, #eef2ff, #e0e7ff);
+  :root{
+    --accent:#6366f1;
+    --bg:linear-gradient(120deg,#eef2ff,#e0e7ff);
+    --card:#fff;
+    --maxw:980px;
   }
-  body {
-    font-family: Inter, "Noto Sans KR", system-ui;
-    background: var(--bg-light);
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-  }
-  .card {
-    max-width: 900px;
-    width: 100%;
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 {
-    font-size: 1.3rem;
-    background: linear-gradient(45deg, #4f46e5, #8b5cf6);
-    -webkit-background-clip: text;
-    color: transparent;
-  }
-  .btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 8px 12px;
-    cursor: pointer;
-  }
-  .start-box, .question-card, .result-card {
-    border-radius: 12px;
-    background: white;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.06);
-    padding: 16px;
-  }
-  .question-card, .result-card { display: none; }
-  .choices { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-  .choice { padding: 10px; border-radius: 8px; background: #f8fafc; cursor: pointer; }
-  .choice:hover { background: #eef2ff; }
-  .trait-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-  .trait { border-radius: 12px; padding: 12px; text-align: center; font-size: 0.9rem; }
-  .E { background: #eff6ff; color: #1d4ed8; }
-  .S { background: #f0fdf4; color: #15803d; }
-  .O { background: #fff7ed; color: #c2410c; }
-  .C { background: #f5f3ff; color: #6d28d9; }
-  @media (max-width:700px) { body { padding: 10px; } }
+  *{box-sizing:border-box}
+  body{font-family:Inter, "Noto Sans KR", system-ui; margin:0; padding:20px; display:flex; justify-content:center; background:var(--bg)}
+  .card{width:100%;max-width:var(--maxw);background:var(--card);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.06)}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{margin:0;font-size:1.2rem;background:linear-gradient(45deg,#4f46e5,#8b5cf6);-webkit-background-clip:text;color:transparent}
+  #headerControls{display:flex;gap:8px;align-items:center}
+  select,input,button{font-size:0.95rem;padding:8px 10px;border-radius:8px;border:1px solid #e6e9f2;background:transparent}
+  button.btn{background:var(--accent);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(99,102,241,0.12)}
+  main{display:flex;gap:16px;flex-wrap:wrap}
+  .quiz{flex:1 1 420px;min-width:280px}
+  .start-box,.question-card,.result-card{border-radius:12px;padding:14px;background:rgba(255,255,255,0.98);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+  .intro{color:#475569;margin:6px 0 12px;font-size:0.95rem;line-height:1.4}
+  .trait-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  .trait{border-radius:10px;padding:10px;text-align:center;font-size:0.9rem}
+  .E{background:#eff6ff;color:#1d4ed8} .S{background:#f0fdf4;color:#15803d}
+  .O{background:#fff7ed;color:#c2410c} .C{background:#f5f3ff;color:#6d28d9}
+  .progress{height:10px;background:#eef2ff;border-radius:999px;overflow:hidden;margin:10px 0}
+  .progress > .fill{height:100%;width:0;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .3s}
+  .choices{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .choice{padding:12px;border-radius:10px;background:#f8fafc;cursor:pointer;border:1px solid transparent;transition:all .15s}
+  .choice:hover{transform:translateY(-3px);background:#eef2ff;border-color:rgba(99,102,241,0.12)}
+  .visual{width:360px;flex:0 0 360px;min-width:260px;display:flex;flex-direction:column;gap:12px}
+  .chart-wrap{border-radius:12px;padding:12px;background:rgba(255,255,255,0.98);height:360px;display:flex;flex-direction:column}
+  .small{font-size:0.9rem;color:#64748b}
+  @media(max-width:980px){main{flex-direction:column-reverse}.visual{width:100%}}
 </style>
 </head>
 <body>
-<div class="card">
-  <header>
-    <h1 id="title">심리테스트 — E/S/O/C 분석</h1>
-    <div id="headerControls">
-      <select id="langSelect"></select>
-      <button class="btn" id="startBtn">시작</button>
-    </div>
-  </header>
+  <div class="card" role="application" aria-label="심리테스트">
+    <header>
+      <h1 id="appTitle">심리테스트 — E/S/O/C</h1>
+      <div id="headerControls">
+        <select id="langSelect" aria-label="언어 선택"></select>
+        <button class="btn" id="startBtn">시작</button>
+      </div>
+    </header>
 
-  <section id="startBox" class="start-box">
-    <p id="introText">언어를 선택하고 시작하세요.</p>
-    <div class="trait-cards">
-      <div class="trait E">💬 <strong>E — 외향성</strong><br>사람들과 어울리며 에너지를 얻는 타입</div>
-      <div class="trait S">⚖️ <strong>S — 안정성</strong><br>차분하고 균형 잡힌 판단을 중시하는 타입</div>
-      <div class="trait O">💡 <strong>O — 개방성</strong><br>새로운 아이디어와 변화를 즐기는 타입</div>
-      <div class="trait C">📘 <strong>C — 성실성</strong><br>책임감 있고 계획적인 완벽주의자</div>
-    </div>
-  </section>
+    <main>
+      <!-- quiz column -->
+      <section class="quiz" aria-live="polite">
+        <div id="startBox" class="start-box">
+          <p id="introText" class="intro">언어를 선택한 뒤 테스트를 시작하세요. 시작하면 언어 선택과 시작 버튼은 숨겨집니다.</p>
+          <div class="trait-cards" role="list">
+            <div class="trait E" role="listitem">💬 <strong>E — 외향성</strong><div class="small">사람들과 어울리며 에너지를 얻는 타입</div></div>
+            <div class="trait S" role="listitem">⚖️ <strong>S — 안정성</strong><div class="small">차분하고 균형을 중시하는 타입</div></div>
+            <div class="trait O" role="listitem">💡 <strong>O — 개방성</strong><div class="small">새롭고 창의적인 것을 즐기는 타입</div></div>
+            <div class="trait C" role="listitem">📘 <strong>C — 성실성</strong><div class="small">계획적이고 책임감 있는 타입</div></div>
+          </div>
+        </div>
 
-  <section id="questionCard" class="question-card">
-    <div id="progress" style="height:10px;background:#e5e7eb;border-radius:10px;">
-      <div id="progressFill" style="height:10px;width:0;background:#6366f1;border-radius:10px;"></div>
-    </div>
-    <h3 id="questionTitle"></h3>
-    <div class="choices" id="choices"></div>
-  </section>
+        <div id="questionCard" class="question-card" style="display:none; margin-top:12px;">
+          <div class="progress"><div class="fill" id="progressFill"></div></div>
+          <div id="questionTitle" class="question-title" style="font-weight:700"></div>
+          <div class="choices" id="choices" role="list"></div>
+        </div>
 
-  <section id="resultCard" class="result-card">
-    <h3 id="resultTitle"></h3>
-    <p id="resultSummary"></p>
-    <canvas id="resultChart" style="width:100%;max-height:300px;"></canvas>
-    <button class="btn" id="restartBtn">다시하기</button>
-  </section>
-</div>
+        <div id="resultCard" class="result-card" style="display:none; margin-top:12px;">
+          <h3 id="resultTitle">결과</h3>
+          <p id="resultSummary" class="small"></p>
+          <div id="traitDetails" style="margin-top:8px"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn" id="restartBtn">다시하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- visualization column -->
+      <aside class="visual" aria-hidden="false">
+        <div class="chart-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="small">차트 (레이더)</div>
+            <div class="small" id="chartHint">결과 후 자동 표시</div>
+          </div>
+          <div style="flex:1;position:relative;margin-top:8px;">
+            <canvas id="resultChart" role="img" aria-label="결과 차트" style="width:100%;height:100%"></canvas>
+          </div>
+        </div>
+        <div class="small" style="text-align:center">아이콘: 💬 E · ⚖️ S · 💡 O · 📘 C</div>
+      </aside>
+    </main>
+  </div>
 
 <script>
-/* ===== 다국어 질문 데이터 ===== */
+/* ======================
+   다국어 데이터 (ko/en/ja/fr/es/zh)
+   각 항목: 질문 리스트, trait 설명, UI 텍스트
+   ====================== */
 const DATA = {
   ko: {
-    title: "심리테스트 — E/S/O/C 분석",
+    title: "심리테스트 — E/S/O/C",
     intro: "질문에 답하면 E/S/O/C 성향을 분석해 드립니다.",
-    start: "시작", again: "다시하기",
+    start: "시작", retry: "다시하기",
     questions: [
-      { q: "주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?",
-        c: [["먼저 참여 의사를 밝힌다", "E"], ["조용히 상황을 지켜본다", "S"], ["새로운 활동을 제안한다", "O"], ["일정을 꼼꼼히 확인한다", "C"]] },
-      { q: "낯선 사람들과 있을 때 당신의 행동은?",
-        c: [["먼저 말을 건다", "E"], ["필요할 때만 말한다", "S"], ["새로운 주제를 제시한다", "O"], ["상대 반응을 살핀다", "C"]] },
-      { q: "새로운 일을 맡게 되었을 때 어떻게 시작하나요?",
-        c: [["협력하며 진행한다", "E"], ["계획을 세운다", "C"], ["즉흥적으로 시도한다", "O"], ["지침을 숙지한 후 진행한다", "S"]] },
-      { q: "여행을 준비할 때 가장 중요하게 생각하는 것은?",
-        c: [["모두가 즐길 일정", "E"], ["편안한 숙소", "S"], ["새로운 경험", "O"], ["세부 계획", "C"]] },
-      { q: "모임에서 의견이 나뉠 때 당신은?",
-        c: [["분위기를 이끌며 조율한다", "E"], ["조용히 판단한다", "S"], ["창의적 해결책을 제시한다", "O"], ["논리적으로 근거를 제시한다", "C"]] }
+      { q:"주말에 친구들이 약속을 잡을 때, 당신은 어떤 반응을 보이나요?", c:[["먼저 참여 의사를 밝힌다","E"],["조용히 지켜본다","S"],["새로운 활동을 제안한다","O"],["일정을 꼼꼼히 확인한다","C"]] },
+      { q:"낯선 사람들과 함께 있을 때, 당신은 무엇을 하나요?", c:[["먼저 말을 건다","E"],["필요할 때만 말한다","S"],["흥미있는 주제를 꺼낸다","O"],["상대 반응을 살핀다","C"]] },
+      { q:"새로운 일을 맡았을 때, 어떻게 시작하나요?", c:[["사람들과 협력한다","E"],["계획을 세운다","C"],["즉흥적으로 시도한다","O"],["지침을 숙지한 후 시작한다","S"]] },
+      { q:"여행을 준비할 때 가장 중요하게 생각하는 것은?", c:[["모두가 즐길 일정","E"],["편안한 숙소","S"],["새로운 경험","O"],["세부 계획","C"]] },
+      { q:"모임에서 의견이 갈릴 때 당신은?", c:[["분위기를 이끌며 조율한다","E"],["조용히 판단한다","S"],["창의적 해결책을 제시한다","O"],["논리적으로 근거를 제시한다","C"]] }
     ],
     traits: {
-      E: "사람들과의 교류를 통해 에너지를 얻고 활발히 활동합니다.",
-      S: "안정과 신중함을 중시하며 차분하게 행동합니다.",
-      O: "새로운 아이디어와 경험을 추구하는 창의적 사고를 가집니다.",
-      C: "책임감 있고 계획적으로 목표를 달성합니다."
+      E: "사교적이며 사람들과 어울리면서 에너지를 얻는 유형입니다.",
+      S: "안정과 신중함을 중요시하며 차분한 접근을 선호합니다.",
+      O: "새로운 경험과 아이디어를 즐기며 창의적입니다.",
+      C: "체계적이고 책임감 있게 계획을 실천하는 유형입니다."
     },
-    labels: { E: "외향형 💬", S: "안정형 ⚖️", O: "개방형 💡", C: "성실형 📘" }
+    labels: {E:"외향성 💬", S:"안정성 ⚖️", O:"개방성 💡", C:"성실성 📘"},
+    ttsIntro: "테스트를 시작합니다. 질문을 잘 듣고 답해주세요.",
+    ttsFinish: "결과가 준비되었습니다. 그래프와 설명을 확인하세요."
   },
+
   en: {
-    title: "Personality Test — E/S/O/C Analyzer",
-    intro: "Answer a few questions to discover your E/S/O/C personality type.",
-    start: "Start", again: "Retry",
+    title: "Personality Test — E/S/O/C",
+    intro: "Answer questions to analyze E/S/O/C traits.",
+    start: "Start", retry: "Retry",
     questions: [
-      { q: "When friends plan a weekend hangout, how do you react?",
-        c: [["Join eagerly", "E"], ["Observe quietly", "S"], ["Suggest something new", "O"], ["Check the schedule first", "C"]] },
-      { q: "At a party with strangers, what do you do?",
-        c: [["Start talking first", "E"], ["Speak only when needed", "S"], ["Introduce a new topic", "O"], ["Read the room", "C"]] },
-      { q: "When you start a new task, what’s your style?",
-        c: [["Work with others", "E"], ["Plan first", "C"], ["Jump in creatively", "O"], ["Follow the guide", "S"]] },
-      { q: "What matters most when preparing a trip?",
-        c: [["Fun for everyone", "E"], ["Comfortable stay", "S"], ["New experiences", "O"], ["Detailed planning", "C"]] },
-      { q: "When opinions differ in a group, you...",
-        c: [["Mediate the discussion", "E"], ["Stay calm and observe", "S"], ["Propose a creative fix", "O"], ["Back your point logically", "C"]] }
+      { q:"When friends plan a weekend, how do you react?", c:[["I volunteer to join","E"],["I observe quietly","S"],["I suggest something new","O"],["I check the schedule first","C"]] },
+      { q:"When with strangers, what do you do?", c:[["I start conversations","E"],["I speak only when needed","S"],["I bring up new topics","O"],["I observe reactions first","C"]] },
+      { q:"How do you begin a new task?", c:[["I collaborate with others","E"],["I plan carefully","C"],["I try things creatively","O"],["I study guidelines then start","S"]] },
+      { q:"What matters most when preparing a trip?", c:[["Fun for everyone","E"],["Comfortable lodging","S"],["New experiences","O"],["Detailed planning","C"]] },
+      { q:"When opinions split, how do you act?", c:[["I mediate and lead","E"],["I calmly assess","S"],["I propose creative fixes","O"],["I present logical reasons","C"]] }
     ],
     traits: {
-      E: "You’re energized by social interaction and enjoy being around people.",
-      S: "You value calmness, balance, and steady decision-making.",
-      O: "You’re curious, imaginative, and open to new experiences.",
-      C: "You’re responsible, organized, and goal-oriented."
+      E: "You gain energy from social interaction and enjoy being around people.",
+      S: "You prefer calm, steady approaches and value balance.",
+      O: "You enjoy novelty, creativity, and exploring new ideas.",
+      C: "You are organized, responsible, and plan-oriented."
     },
-    labels: { E: "Extrovert 💬", S: "Stable ⚖️", O: "Open 💡", C: "Conscientious 📘" }
+    labels: {E:"Extrovert 💬", S:"Stable ⚖️", O:"Open 💡", C:"Conscientious 📘"},
+    ttsIntro: "Starting the test. Please listen to the questions and answer.",
+    ttsFinish: "Your results are ready. Check the chart and descriptions."
   },
+
   ja: {
-    title: "心理テスト — E/S/O/C 分析",
-    intro: "いくつかの質問に答えて、あなたの性格傾向を分析します。",
-    start: "スタート", again: "もう一度",
+    title: "心理テスト — E/S/O/C",
+    intro: "いくつかの質問に答えて、傾向を分析します。",
+    start: "開始", retry: "もう一度",
     questions: [
-      { q: "友達が週末の予定を立てるとき、あなたはどうしますか？",
-        c: [["すぐに参加を表明する", "E"], ["静かに様子を見る", "S"], ["新しい提案をする", "O"], ["スケジュールを確認する", "C"]] },
-      { q: "知らない人といるとき、あなたの行動は？",
-        c: [["自分から話しかける", "E"], ["必要な時だけ話す", "S"], ["新しい話題を出す", "O"], ["相手の反応を見る", "C"]] },
-      { q: "新しい仕事を任されたとき、どのように始めますか？",
-        c: [["協力して進める", "E"], ["計画を立てる", "C"], ["すぐに試してみる", "O"], ["指示を確認する", "S"]] },
-      { q: "旅行の準備で一番大事なのは？",
-        c: [["みんなが楽しめる予定", "E"], ["快適な宿泊", "S"], ["新しい体験", "O"], ["細かい計画", "C"]] },
-      { q: "意見が分かれたとき、あなたは？",
-        c: [["雰囲気をまとめる", "E"], ["静かに判断する", "S"], ["創造的な解決を出す", "O"], ["論理的に説明する", "C"]] }
+      { q:"友達が週末の予定を立てるとき、あなたはどうしますか？", c:[["参加を表明する","E"],["静かに様子を見る","S"],["新しい案を提案する","O"],["予定を確認してから決める","C"]] },
+      { q:"知らない人といるとき、あなたはどうしますか？", c:[["自分から話す","E"],["必要なときだけ話す","S"],["新しい話題を出す","O"],["相手の反応を見る","C"]] },
+      { q:"新しい仕事を任されたら、どう始めますか？", c:[["協力して進める","E"],["計画を立てる","C"],["試して学ぶ","O"],["指示を確認してから始める","S"]] },
+      { q:"旅行準備で一番重視するのは？", c:[["みんなが楽しめること","E"],["快適な宿泊","S"],["新しい体験","O"],["詳細な計画","C"]] },
+      { q:"意見が分かれたとき、あなたは？", c:[["まとめ役になる","E"],["冷静に判断する","S"],["創造的な提案をする","O"],["論理的に説明する","C"]] }
     ],
     traits: {
-      E: "人との交流からエネルギーを得るタイプです。",
-      S: "落ち着きと安定を大切にする慎重派です。",
-      O: "新しい体験や変化を楽しむ創造的なタイプです。",
-      C: "責任感が強く、計画的に物事を進めます。"
+      E: "人との交流でエネルギーを得るタイプです。",
+      S: "落ち着きと安定を好む慎重なタイプです。",
+      O: "新しい体験や創造的なことを好むタイプです。",
+      C: "計画的で責任感が強いタイプです。"
     },
-    labels: { E: "外向型 💬", S: "安定型 ⚖️", O: "開放型 💡", C: "誠実型 📘" }
+    labels: {E:"外向型 💬", S:"安定型 ⚖️", O:"開放型 💡", C:"誠実型 📘"},
+    ttsIntro: "テストを開始します。質問を聞いて回答してください。",
+    ttsFinish: "結果が出ました。チャートと説明を確認してください。"
+  },
+
+  fr: {
+    title: "Test de personnalité — E/S/O/C",
+    intro: "Répondez aux questions pour analyser vos traits E/S/O/C.",
+    start: "Commencer", retry: "Recommencer",
+    questions: [
+      { q:"Quand des amis planifient un week-end, comment réagissez-vous ?", c:[["Je me porte volontaire","E"],["J'observe tranquillement","S"],["Je propose quelque chose de nouveau","O"],["Je vérifie l'emploi du temps","C"]] },
+      { q:"Avec des inconnus, que faites-vous ?", c:[["Je commence la conversation","E"],["Je parle si nécessaire","S"],["Je propose de nouveaux sujets","O"],["J'observe les réactions","C"]] },
+      { q:"Comment commencez-vous une nouvelle tâche ?", c:[["Je collabore","E"],["Je planifie","C"],["J'essaie de manière créative","O"],["Je lis les instructions","S"]] },
+      { q:"Lors de la préparation d'un voyage, qu'est-ce qui compte le plus ?", c:[["Un itinéraire apprécié de tous","E"],["Un hébergement confortable","S"],["De nouvelles expériences","O"],["Un planning détaillé","C"]] },
+      { q:"Si les opinions divergent, que faites-vous ?", c:[["Je médie et guide","E"],["J'observe calmement","S"],["Je propose des solutions créatives","O"],["J'apporte des arguments logiques","C"]] }
+    ],
+    traits: {
+      E: "Vous vous ressourçez par les interactions sociales et aimez être avec les autres.",
+      S: "Vous privilégiez la stabilité, le calme et la prise de décision équilibrée.",
+      O: "Vous aimez la nouveauté et les idées créatives.",
+      C: "Vous êtes organisé, responsable et axé sur les objectifs."
+    },
+    labels: {E:"Extraverti 💬", S:"Stable ⚖️", O:"Ouvert 💡", C:"Consciencieux 📘"},
+    ttsIntro: "Démarrage du test. Écoutez les questions et répondez.",
+    ttsFinish: "Les résultats sont prêts. Consultez le graphique et les explications."
+  },
+
+  es: {
+    title: "Test de personalidad — E/S/O/C",
+    intro: "Responde preguntas para analizar tus rasgos E/S/O/C.",
+    start: "Comenzar", retry: "Reintentar",
+    questions: [
+      { q:"Cuando amigos planean el fin de semana, ¿cómo reaccionas?", c:[["Me ofrezco para participar","E"],["Observo en silencio","S"],["Propongo algo nuevo","O"],["Reviso el horario primero","C"]] },
+      { q:"Con desconocidos, ¿qué haces?", c:[["Inicio la conversación","E"],["Hablo si es necesario","S"],["Propongo nuevos temas","O"],["Observo las reacciones","C"]] },
+      { q:"¿Cómo empiezas una nueva tarea?", c:[["Colaboro con otros","E"],["Planifico","C"],["Pruebo creativamente","O"],["Sigo las instrucciones","S"]] },
+      { q:"Al preparar un viaje, ¿qué importa más?", c:[["Diversión para todos","E"],["Alojamiento cómodo","S"],["Nuevas experiencias","O"],["Plan detallado","C"]] },
+      { q:"Si hay desacuerdo, ¿qué haces?", c:[["Medio y guío","E"],["Evalúo con calma","S"],["Propongo soluciones creativas","O"],["Presento argumentos lógicos","C"]] }
+    ],
+    traits: {
+      E: "Te energizas con la interacción social y disfrutas estar con la gente.",
+      S: "Prefieres calma, estabilidad y decisiones equilibradas.",
+      O: "Disfrutas la novedad, la creatividad y nuevas experiencias.",
+      C: "Eres organizado, responsable y orientado a objetivos."
+    },
+    labels: {E:"Extrovertido 💬", S:"Estable ⚖️", O:"Abierto 💡", C:"Concienzudo 📘"},
+    ttsIntro: "Iniciando la prueba. Escucha las preguntas y responde.",
+    ttsFinish: "Tus resultados están listos. Revisa el gráfico y las descripciones."
+  },
+
+  zh: {
+    title: "人格测试 — E/S/O/C",
+    intro: "回答问题以分析您的 E/S/O/C 性格特征。",
+    start: "开始", retry: "重试",
+    questions: [
+      { q:"当朋友计划周末活动时，你通常如何反应？", c:[["主动参与","E"],["静静观察","S"],["提出新建议","O"],["先看日程安排","C"]] },
+      { q:"与陌生人在一起时，你会怎么做？", c:[["主动搭话","E"],["只在必要时说话","S"],["提出新话题","O"],["先观察反应","C"]] },
+      { q:"开始一项新任务时，你怎样做？", c:[["与他人协作","E"],["先计划再做","C"],["创造性尝试","O"],["先熟悉说明再做","S"]] },
+      { q:"准备旅行时，你最看重什么？", c:[["大家都能享受的行程","E"],["舒适稳定的住宿","S"],["新的体验","O"],["详细计划","C"]] },
+      { q:"当意见分歧时，你会怎么做？", c:[["协调并引导","E"],["冷静评估","S"],["提出创造性方案","O"],["用逻辑说明观点","C"]] }
+    ],
+    traits: {
+      E: "通过社交互动获得能量，喜欢与人相处。",
+      S: "重视稳定与谨慎，偏好平稳的选择。",
+      O: "喜欢新奇与创意，乐于尝试新体验。",
+      C: "有责任感且有条理，注重计划与执行。"
+    },
+    labels: {E:"外向 💬", S:"稳定 ⚖️", O:"开放 💡", C:"尽责 📘"},
+    ttsIntro: "开始测试，请听题并回答。",
+    ttsFinish: "测试完成，查看图表与说明。"
   }
 };
 
-let lang = "ko", qIndex = 0, scores = {E:0,S:0,O:0,C:0}, questions = [];
-const langSelect=document.getElementById("langSelect"),startBtn=document.getElementById("startBtn"),
-      startBox=document.getElementById("startBox"),questionCard=document.getElementById("questionCard"),
-      choicesDiv=document.getElementById("choices"),questionTitle=document.getElementById("questionTitle"),
-      progressFill=document.getElementById("progressFill"),resultCard=document.getElementById("resultCard"),
-      resultTitle=document.getElementById("resultTitle"),resultSummary=document.getElementById("resultSummary"),
-      resultChart=document.getElementById("resultChart"),restartBtn=document.getElementById("restartBtn"),
-      title=document.getElementById("title"),intro=document.getElementById("introText"),
-      headerControls=document.getElementById("headerControls");
+/* ======================
+   상태값 & DOM 참조
+   ====================== */
+let lang = 'ko';
+let questions = [], selected = [], qIndex = 0;
+let scores = {E:0,S:0,O:0,C:0};
+let chartInstance = null;
 
-langSelect.innerHTML = Object.keys(DATA).map(k=>`<option value="${k}">${k.toUpperCase()}</option>`).join("");
-langSelect.onchange = e => setLanguage(e.target.value);
-startBtn.onclick = startQuiz;
-restartBtn.onclick = ()=>location.reload();
+const langSelect = document.getElementById('langSelect');
+const startBtn = document.getElementById('startBtn');
+const headerControls = document.getElementById('headerControls');
+const introText = document.getElementById('introText');
+const startBox = document.getElementById('startBox');
+const questionCard = document.getElementById('questionCard');
+const questionTitle = document.getElementById('questionTitle');
+const choicesDiv = document.getElementById('choices');
+const progressFill = document.getElementById('progressFill');
+const resultCard = document.getElementById('resultCard');
+const resultTitle = document.getElementById('resultTitle');
+const resultSummary = document.getElementById('resultSummary');
+const traitDetails = document.getElementById('traitDetails');
+const resultChartCanvas = document.getElementById('resultChart');
 
-function setLanguage(l){
-  lang = l;
-  const d = DATA[l];
-  title.textContent = d.title;
-  intro.textContent = d.intro;
-  startBtn.textContent = d.start;
-  restartBtn.textContent = d.again;
+/* ======================
+   초기화: 언어 옵션 채우기, 자동감지
+   ====================== */
+function initLanguages(){
+  langSelect.innerHTML = Object.keys(DATA).map(k=>{
+    const label = {ko:'한국어', en:'English', ja:'日本語', fr:'Français', es:'Español', zh:'中文'}[k] || k;
+    return `<option value="${k}">${label}</option>`;
+  }).join('');
+  // 자동 감지 (브라우저 언어)
+  const userLang = navigator.language ? navigator.language.slice(0,2) : 'ko';
+  if(DATA[userLang]) lang = userLang;
+  langSelect.value = lang;
+  applyTexts();
 }
+function applyTexts(){
+  const d = DATA[lang];
+  document.getElementById('appTitle').innerText = d.title;
+  introText.innerText = d.intro;
+  startBtn.innerText = d.start;
+  // result labels initially
+  resultTitle.innerText = d.labels ? Object.values(d.labels).join(' · ') : 'Result';
+}
+langSelect.addEventListener('change', e => { lang = e.target.value; applyTexts(); });
 
-setLanguage("ko");
+/* ======================
+   시작 / 퀴즈 로직
+   ====================== */
+startBtn.addEventListener('click', startQuiz);
 
 function startQuiz(){
-  headerControls.style.display="none";
-  startBox.style.display="none";
-  questionCard.style.display="block";
-  questions = DATA[lang].questions;
-  qIndex=0; scores={E:0,S:0,O:0,C:0};
+  // 숨기기: 언어 선택 및 시작 버튼
+  headerControls.style.display = 'none';
+  // 초기화
+  questions = DATA[lang].questions.slice();
+  selected = shuffle(questions).slice(0,5); // 5문항 랜덤
+  qIndex = 0;
+  scores = {E:0,S:0,O:0,C:0};
+  // 뷰 토글
+  startBox.style.display = 'none';
+  questionCard.style.display = 'block';
+  resultCard.style.display = 'none';
+  progressFill.style.width = '0%';
+  // TTS: intro
+  speak(DATA[lang].ttsIntro);
   showQuestion();
 }
 
 function showQuestion(){
-  const q = questions[qIndex];
-  questionTitle.textContent = `${qIndex+1}. ${q.q}`;
-  choicesDiv.innerHTML="";
-  q.c.forEach(([text,trait])=>{
-    const div=document.createElement("div");
-    div.className="choice";
-    div.textContent=text;
-    div.onclick=()=>{scores[trait]++;nextQ();};
-    choicesDiv.appendChild(div);
+  const q = selected[qIndex];
+  questionTitle.innerText = `(${qIndex+1}/${selected.length}) ${q.q}`;
+  choicesDiv.innerHTML = '';
+  // 무작위로 선택지 셔플
+  const shuffled = shuffle(q.c);
+  shuffled.forEach(([txt, trait], idx) => {
+    const el = document.createElement('div');
+    el.className = 'choice';
+    el.tabIndex = 0;
+    el.innerText = txt;
+    el.onclick = () => selectChoice(el, trait);
+    el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') selectChoice(el, trait); };
+    choicesDiv.appendChild(el);
   });
-  progressFill.style.width=`${(qIndex/questions.length)*100}%`;
+  progressFill.style.width = `${(qIndex / selected.length) * 100}%`;
+  // TTS: 질문 읽기
+  speak(q.q);
 }
 
-function nextQ(){
-  qIndex++;
-  if(qIndex<questions.length) showQuestion();
-  else finishQuiz();
+function selectChoice(el, trait){
+  // 시각적 선택효과
+  Array.from(choicesDiv.children).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // 잠깐 대기 후 다음
+  setTimeout(()=>{
+    scores[trait] = (scores[trait] || 0) + 1;
+    qIndex++;
+    if(qIndex < selected.length) showQuestion();
+    else finishQuiz();
+  }, 220);
 }
 
+/* ======================
+   결과 처리 & 시각화
+   ====================== */
 function finishQuiz(){
-  questionCard.style.display="none";
-  resultCard.style.display="block";
-  progressFill.style.width="100%";
-  const d = DATA[lang], sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  const top = sorted[0][0];
-  resultTitle.textContent = d.labels[top];
-  resultSummary.textContent = d.traits[top];
-  drawChart();
+  questionCard.style.display = 'none';
+  resultCard.style.display = 'block';
+  progressFill.style.width = '100%';
+  const d = DATA[lang];
+  // 정렬 및 상위 성향 추출
+  const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+  const top3 = sorted.slice(0,3).map(s=>s[0]).join('');
+  const topMain = sorted[0][0];
+  resultTitle.innerText = d.labels[topMain] || topMain;
+  resultSummary.innerText = `${d.traits[topMain] || ''} (${top3})`;
+  // 세부 항목(네 성향 모두)
+  traitDetails.innerHTML = Object.entries(d.traits).map(([k,v])=>{
+    const icon = {E:'💬',S:'⚖️',O:'💡',C:'📘'}[k];
+    const val = scores[k] || 0;
+    return `<div style="margin:6px 0;padding:8px;border-radius:8px;background:#f8fafc">${icon} <strong>${k}</strong> — ${v} <span style="float:right;font-weight:700">${val}</span></div>`;
+  }).join('');
+  // 차트
+  renderChart();
+  // TTS: 결과 안내
+  speak(DATA[lang].ttsFinish + ' ' + (d.traits[topMain] || ''));
 }
 
-function drawChart(){
-  new Chart(resultChart.getContext("2d"),{
-    type:"radar",
-    data:{
-      labels:Object.values(DATA[lang].labels),
-      datasets:[{label:"Score",data:[scores.E,scores.S,scores.O,scores.C],
-        backgroundColor:"rgba(99,102,241,0.2)",borderColor:"#6366f1"}]
+/* ======================
+   Chart 렌더링
+   ====================== */
+function renderChart(){
+  const labels = ['E','S','O','C'];
+  const dataValues = labels.map(l => scores[l] || 0);
+  const ctx = resultChartCanvas.getContext('2d');
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels.map(l => `${l} ${({E:'💬',S:'⚖️',O:'💡',C:'📘'})[l]}`),
+      datasets: [{
+        label: DATA[lang].labels ? (DATA[lang].labels.E ? 'You' : 'You') : 'You',
+        data: dataValues,
+        backgroundColor: 'rgba(99,102,241,0.18)',
+        borderColor: '#6366f1',
+        pointBackgroundColor: '#6366f1',
+        pointRadius:6
+      }]
     },
-    options:{scales:{r:{suggestedMin:0,suggestedMax:5}}}
+    options: {
+      responsive:true,
+      maintainAspectRatio:false,
+      scales: { r: { suggestedMin:0, suggestedMax:5, ticks:{stepSize:1} } },
+      plugins:{legend:{display:false}}
+    }
   });
 }
+
+/* ======================
+   TTS 유틸 (언어 매핑 및 안전처리)
+   ====================== */
+const ttsMap = { ko:'ko-KR', en:'en-US', ja:'ja-JP', fr:'fr-FR', es:'es-ES', zh:'zh-CN' };
+function speak(text){
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = ttsMap[lang] || 'en-US';
+    u.rate = 1;
+    u.pitch = 1;
+    window.speechSynthesis.speak(u);
+  }catch(e){
+    console.warn('TTS error', e);
+  }
+}
+
+/* ======================
+   유틸: shuffle
+   ====================== */
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+
+/* ======================
+   init
+   ====================== */
+initLanguages();
+
+// Restart 버튼: 단순히 새로고침으로 초기 상태 복구
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  // 음성 취소
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  // 재시작: 페이지 새로고침 (언어 선택창 다시 보이게)
+  location.reload();
+});
 </script>
 </body>
 </html>
