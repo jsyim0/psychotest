@@ -1,106 +1,111 @@
-const langSelect = document.getElementById('langSelect');
 const startBtn = document.getElementById('startBtn');
-const headerControls = document.getElementById('headerControls');
-const startBox = document.getElementById('startBox');
-const questionCard = document.getElementById('questionCard');
-const resultCard = document.getElementById('resultCard');
-const questionTitle = document.getElementById('questionTitle');
-const choices = document.getElementById('choices');
-const progressFill = document.getElementById('progressFill');
-const resultTitle = document.getElementById('resultTitle');
-const resultSummary = document.getElementById('resultSummary');
-const traitDetails = document.getElementById('traitDetails');
 const chartWrap = document.getElementById('chartWrap');
+const langSelect = document.getElementById('lang');
 
-let lang = 'ko', qIndex = 0, questions = [], selected = [], scores = {E:0, S:0, O:0, C:0};
+const languages = ['ko','en','ja','fr','es','zh'];
+let currentLang = 'ko';
 
-// --- 데이터는 길어서 분량 절약을 위해 위 HTML 코드의 DATA 객체 그대로 사용 ---
-// (원문 그대로 script.js 상단에 붙여 넣으면 완성됩니다)
+const data = {
+  ko: {
+    start: '시작', next: '다음', restart: '다시 시작',
+    ttsStart: '테스트를 시작합니다.',
+    ttsFinish: '결과가 나왔습니다.',
+    traits: {
+      E: '외향성 — 활발하고 사교적인 성향',
+      S: '안정성 — 차분하고 신뢰감 있는 성향',
+      O: '개방성 — 새로운 아이디어를 즐김',
+      C: '성실성 — 체계적이고 책임감 있는 성향',
+    },
+  },
+  en: {
+    start: 'Start', next: 'Next', restart: 'Restart',
+    ttsStart: 'Starting the test.',
+    ttsFinish: 'Here are your results.',
+    traits: {
+      E: 'Extraversion — Outgoing and sociable',
+      S: 'Stability — Calm and reliable',
+      O: 'Openness — Curious and creative',
+      C: 'Conscientiousness — Organized and responsible',
+    },
+  },
+  ja: {
+    start: 'スタート', next: '次へ', restart: 'もう一度',
+    ttsStart: 'テストを開始します。',
+    ttsFinish: '結果が出ました。',
+    traits: {
+      E: '外向性 — 社交的で活発',
+      S: '安定性 — 落ち着きがあり信頼できる',
+      O: '開放性 — 新しい発想を楽しむ',
+      C: '誠実性 — 計画的で責任感が強い',
+    },
+  },
+  fr: {
+    start: 'Commencer', next: 'Suivant', restart: 'Recommencer',
+    ttsStart: 'Le test commence.',
+    ttsFinish: 'Voici vos résultats.',
+    traits: {
+      E: 'Extraversion — Sociable et énergique',
+      S: 'Stabilité — Calme et fiable',
+      O: 'Ouverture — Curieux et créatif',
+      C: 'Conscience — Organisé et responsable',
+    },
+  },
+  es: {
+    start: 'Comenzar', next: 'Siguiente', restart: 'Reiniciar',
+    ttsStart: 'Comienza la prueba.',
+    ttsFinish: 'Aquí están tus resultados.',
+    traits: {
+      E: 'Extraversión — Sociable y activo',
+      S: 'Estabilidad — Tranquilo y confiable',
+      O: 'Apertura — Curioso y creativo',
+      C: 'Responsabilidad — Organizado y confiable',
+    },
+  },
+  zh: {
+    start: '开始', next: '下一步', restart: '重新开始',
+    ttsStart: '测试开始。',
+    ttsFinish: '结果出来了。',
+    traits: {
+      E: '外向性 — 热情开朗',
+      S: '稳定性 — 冷静可靠',
+      O: '开放性 — 富有好奇心和创造力',
+      C: '尽责性 — 有条理且负责',
+    },
+  },
+};
 
-function speak(txt) {
+// 자동 언어 감지
+const userLang = (navigator.language || 'ko').slice(0, 2);
+if (languages.includes(userLang)) currentLang = userLang;
+langSelect.value = currentLang;
+
+// TTS 기능
+function speak(text) {
   if (!('speechSynthesis' in window)) return;
-  const u = new SpeechSynthesisUtterance(txt);
-  u.lang = {ko:'ko-KR', en:'en-US', ja:'ja-JP', es:'es-ES'}[lang] || 'en-US';
-  u.rate = 1;
-  window.speechSynthesis.speak(u);
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = currentLang === 'zh' ? 'zh-CN' : currentLang;
+  window.speechSynthesis.speak(utter);
 }
 
-function shuffle(a) {
-  return a.map(v => [v, Math.random()]).sort((a, b) => a[1] - b[1]).map(v => v[0]);
-}
-
+// 시작
 function startQuiz() {
-  headerControls.style.display = 'none';
-  startBox.style.display = 'none';
-  questionCard.style.display = 'block';
-  resultCard.style.display = 'none';
+  speak(data[currentLang].ttsStart);
+  document.getElementById('startBox').style.display = 'none';
+  document.getElementById('questionBox').style.display = 'block';
+  startBtn.style.display = 'none';
+  langSelect.disabled = true;
+  // 차트 숨김
   chartWrap.classList.remove('visible');
-  progressFill.style.width = '0%';
-  questions = DATA[lang].questions.slice();
-  selected = shuffle(questions).slice(0, 5);
-  qIndex = 0; scores = {E:0, S:0, O:0, C:0};
-  speak(DATA[lang].ttsIntro);
-  showQuestion();
 }
 
-function showQuestion() {
-  const q = selected[qIndex];
-  questionTitle.innerText = q.q;
-  choices.innerHTML = '';
-  q.a.forEach(c => {
-    const btn = document.createElement('div');
-    btn.className = 'choice';
-    btn.innerText = c.text;
-    btn.addEventListener('click', () => selectAnswer(c.t));
-    choices.appendChild(btn);
-  });
-  progressFill.style.width = (qIndex / selected.length * 100) + '%';
-}
-
-function selectAnswer(t) {
-  scores[t]++;
-  qIndex++;
-  if (qIndex < selected.length) showQuestion();
-  else finishQuiz();
-}
-
-function renderChart() {
-  const ctx = document.getElementById('resultChart');
-  const chartData = {
-    labels: Object.keys(scores),
-    datasets: [{
-      label: '점수',
-      data: Object.values(scores),
-      fill: true,
-      borderColor: '#6366f1',
-      backgroundColor: 'rgba(99,102,241,0.2)',
-      pointBackgroundColor: '#6366f1'
-    }]
-  };
-  new Chart(ctx, { type: 'radar', data: chartData, options: { scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } } } });
-}
-
-function finishQuiz() {
-  questionCard.style.display = 'none';
-  resultCard.style.display = 'block';
-  progressFill.style.width = '100%';
-  const d = DATA[lang];
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const topMain = sorted[0][0];
-  const top3 = sorted.slice(0, 3).map(s => s[0]).join('');
-  resultTitle.innerText = d.labels[topMain];
-  resultSummary.innerText = `${d.traits[topMain]} (${top3})`;
-  traitDetails.innerHTML = Object.entries(d.traits)
-    .map(([k, v]) => `<div style="margin:6px 0;padding:8px;border-radius:8px;background:#f8fafc">
-      <strong>${k}</strong> — ${v} <span style="float:right;font-weight:700">${scores[k]}</span></div>`).join('');
-  renderChart();
+// 결과 표시 (예시)
+function showResult() {
   chartWrap.classList.add('visible');
-  speak(d.ttsFinish + ' ' + d.traits[topMain]);
+  speak(data[currentLang].ttsFinish);
 }
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  chartWrap.classList.remove('visible');
-  location.reload();
-});
+// 이벤트
 startBtn.addEventListener('click', startQuiz);
+langSelect.addEventListener('change', e => {
+  currentLang = e.target.value;
+});
